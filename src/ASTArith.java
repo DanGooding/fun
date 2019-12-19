@@ -15,10 +15,16 @@ abstract class ASTArith extends ASTNode {
 
     @Override
     ConstantValue evaluate(Environment env) {
-        ConstantValue leftValue = left.evaluate(env);
-        ConstantValue rightValue = right.evaluate(env);
+        Value leftValue = left.evaluate(env);
+        Value rightValue = right.evaluate(env);
 
-        return new ConstantValue(operator(leftValue.getValue(), rightValue.getValue()));
+        if (leftValue instanceof ConstantValue && rightValue instanceof ConstantValue){
+            int leftOperand = ((ConstantValue) leftValue).getValue();
+            int rightOperand = ((ConstantValue) rightValue).getValue();
+            return new ConstantValue(operator(leftOperand, rightOperand));
+        }else {
+            throw new RuntimeException("can only perform arithmetic on constant value");
+        }
     }
 
     @Override

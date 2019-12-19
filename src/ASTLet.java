@@ -12,8 +12,8 @@ class ASTLet extends ASTNode {
     }
 
     @Override
-    ConstantValue evaluate(Environment env) {
-        ConstantValue assignedValue = assigned.evaluate(env);
+    Value evaluate(Environment env) {
+        Value assignedValue = assigned.evaluate(env);
 
         Environment bodyEnv = new Environment(env);
         bodyEnv.bind(name, assignedValue);

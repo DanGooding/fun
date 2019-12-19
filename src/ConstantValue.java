@@ -1,4 +1,5 @@
-class ConstantValue {
+class ConstantValue implements Value {
+
     private final int value;
 
     ConstantValue(int value) {

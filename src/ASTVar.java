@@ -6,7 +6,7 @@ class ASTVar extends ASTNode {
     }
 
     @Override
-    ConstantValue evaluate(Environment env) {
+    Value evaluate(Environment env) {
         if (env.hasName(name)) {
             return env.lookup(name);
         }
