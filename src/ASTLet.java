@@ -15,8 +15,7 @@ class ASTLet extends ASTNode {
     Value evaluate(Environment env) {
         Value assignedValue = assigned.evaluate(env);
 
-        Environment bodyEnv = new Environment(env);
-        bodyEnv.bind(name, assignedValue);
+        Environment bodyEnv = env.withBinding(name, assignedValue);
 
         return body.evaluate(bodyEnv);
     }

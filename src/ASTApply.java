@@ -15,14 +15,15 @@ public class ASTApply extends ASTNode {
 
         if (possibleFunctionValue instanceof FunctionValue) {
             // TODO: this is awful naming
-            FunctionValue functionValue = (FunctionValue) possibleFunctionValue;
+            FunctionValue funObj = (FunctionValue) possibleFunctionValue;
 
-            Environment internalEnv = new Environment(functionValue.getCapturedEnv());
-            internalEnv.bind(functionValue.getParameter(), argumentValue);
+            Environment internalEnv =
+                funObj.getCapturedEnv().withBinding(funObj.getParameter(), argumentValue);
 
-            return functionValue.getBody().evaluate(internalEnv);
+            return funObj.getBody().evaluate(internalEnv);
 
         }else {
+
             throw new TypeErrorException("a ConstantValue is not a function, it cannot be applied");
         }
     }
