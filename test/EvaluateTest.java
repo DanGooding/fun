@@ -1,3 +1,4 @@
+import junit.framework.TestCase;
 import org.junit.Test;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -9,16 +10,16 @@ public class EvaluateTest {
         // ARRANGE
         ASTNode ast =
             new ASTPlus(
-                new ASTLiteral(2),
-                new ASTLiteral(3)
+                new ASTLiteralInt(2),
+                new ASTLiteralInt(3)
             );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(ConstantValue.class);
-        assertThat(((ConstantValue) result).getValue()).isEqualTo(5);
+        assertThat(result).isInstanceOf(IntValue.class);
+        assertThat(((IntValue) result).getValue()).isEqualTo(5);
     }
 
     @Test
@@ -26,16 +27,16 @@ public class EvaluateTest {
         // ARRANGE
         ASTNode ast =
             new ASTMult(
-                new ASTLiteral(2),
-                new ASTLiteral(3)
+                new ASTLiteralInt(2),
+                new ASTLiteralInt(3)
             );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(ConstantValue.class);
-        assertThat(((ConstantValue) result).getValue()).isEqualTo(6);
+        assertThat(result).isInstanceOf(IntValue.class);
+        assertThat(((IntValue) result).getValue()).isEqualTo(6);
     }
 
     @Test
@@ -45,7 +46,7 @@ public class EvaluateTest {
         ASTNode ast =
             new ASTLet(
                 "x",
-                new ASTLiteral(2),
+                new ASTLiteralInt(2),
                 new ASTLet(
                     "y",
                     new ASTMult(
@@ -74,8 +75,8 @@ public class EvaluateTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(ConstantValue.class);
-        assertThat(((ConstantValue) result).getValue()).isEqualTo(14);
+        assertThat(result).isInstanceOf(IntValue.class);
+        assertThat(((IntValue) result).getValue()).isEqualTo(14);
     }
 
     @Test
@@ -103,11 +104,11 @@ public class EvaluateTest {
                     "addOne",
                     new ASTApply(
                         new ASTVar("add"),
-                        new ASTLiteral(1)
+                        new ASTLiteralInt(1)
                     ),
                     new ASTApply(
                         new ASTVar("addOne"),
-                        new ASTLiteral(2)
+                        new ASTLiteralInt(2)
                     )
                 )
             );
@@ -116,8 +117,8 @@ public class EvaluateTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(ConstantValue.class);
-        assertThat(((ConstantValue) result).getValue()).isEqualTo(3);
+        assertThat(result).isInstanceOf(IntValue.class);
+        assertThat(((IntValue) result).getValue()).isEqualTo(3);
     }
 
     @Test
@@ -133,7 +134,7 @@ public class EvaluateTest {
         ASTNode ast =
             new ASTLet(
                 "x",
-                new ASTLiteral(1),
+                new ASTLiteralInt(1),
                 new ASTLet(
                     "f",
                     new ASTFun(
@@ -145,10 +146,10 @@ public class EvaluateTest {
                     ),
                     new ASTLet(
                         "x",
-                        new ASTLiteral(2),
+                        new ASTLiteralInt(2),
                         new ASTApply(
                             new ASTVar("f"),
-                            new ASTLiteral(0)
+                            new ASTLiteralInt(0)
                         )
                     )
                 )
@@ -158,9 +159,70 @@ public class EvaluateTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(ConstantValue.class);
-        assertThat(((ConstantValue) result).getValue()).isEqualTo(1);
+        assertThat(result).isInstanceOf(IntValue.class);
+        assertThat(((IntValue) result).getValue()).isEqualTo(1);
 
     }
+
+    @Test
+    public void if_takesTrueBranch_forTrue() {
+        // ARRANGE
+        ASTNode ast = new ASTIf(
+            new ASTLiteralBool(true),
+            new ASTLiteralInt(1),
+            new ASTLiteralInt(0)
+        );
+
+        // ACT
+        Value result = ast.evaluate();
+
+        // ASSERT
+        assertThat(result).isInstanceOf(IntValue.class);
+        assertThat(((IntValue) result).getValue()).isEqualTo(1);
+    }
+
+    @Test
+    public void if_takesFalseBranch_forFalse() {
+        // ARRANGE
+        ASTNode ast = new ASTIf(
+            new ASTLiteralBool(false),
+            new ASTLiteralInt(1),
+            new ASTLiteralInt(0)
+        );
+
+        // ACT
+        Value result = ast.evaluate();
+
+        // ASSERT
+        assertThat(result).isInstanceOf(IntValue.class);
+        assertThat(((IntValue) result).getValue()).isEqualTo(0);
+    }
+
+    @Test
+    public void if_onlyEvaluates_oneBranch() {
+        // ARRANGE
+        ASTNode ast =
+            new ASTIf(
+                new ASTLiteralBool(false),
+                new ASTLiteralInt(0) {
+                    @Override
+                    IntValue evaluate(Environment env) {
+                        TestCase.fail();  // this should not be evaluated, fail the test if it is
+                        return super.evaluate(env);
+                    }
+                },
+                new ASTLiteralInt(0)
+            );
+
+        // ACT
+        Value result = ast.evaluate();
+
+        // ASSERT
+
+    }
+
+
+
+
 
 }

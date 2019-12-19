@@ -10,8 +10,7 @@ class ASTVar extends ASTNode {
         if (env.hasName(name)) {
             return env.lookup(name);
         }
-        // TODO: don't be lazy: use specific exception type, (checked?)
-        throw new RuntimeException(String.format("unbound variable '%s'", name));
+        throw new TypeErrorException(String.format("unbound variable '%s'", name));
     }
 
     @Override

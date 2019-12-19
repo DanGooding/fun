@@ -1,13 +1,13 @@
-class ASTLiteral extends ASTNode {
+class ASTLiteralInt extends ASTNode {
     private final int value;
 
-    ASTLiteral(int value) {
+    ASTLiteralInt(int value) {
         this.value = value;
     }
 
     @Override
-    ConstantValue evaluate(Environment env) {
-        return new ConstantValue(this.value);
+    IntValue evaluate(Environment env) {
+        return new IntValue(this.value);
     }
 
     @Override

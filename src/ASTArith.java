@@ -1,3 +1,5 @@
+import java.util.Iterator;
+
 abstract class ASTArith extends ASTNode {
 
     private final ASTNode left;
@@ -14,16 +16,16 @@ abstract class ASTArith extends ASTNode {
     abstract String operatorSymbol();
 
     @Override
-    ConstantValue evaluate(Environment env) {
+    IntValue evaluate(Environment env) {
         Value leftValue = left.evaluate(env);
         Value rightValue = right.evaluate(env);
 
-        if (leftValue instanceof ConstantValue && rightValue instanceof ConstantValue){
-            int leftOperand = ((ConstantValue) leftValue).getValue();
-            int rightOperand = ((ConstantValue) rightValue).getValue();
-            return new ConstantValue(operator(leftOperand, rightOperand));
+        if (leftValue instanceof IntValue && rightValue instanceof IntValue){
+            int leftOperand = ((IntValue) leftValue).getValue();
+            int rightOperand = ((IntValue) rightValue).getValue();
+            return new IntValue(operator(leftOperand, rightOperand));
         }else {
-            throw new RuntimeException("can only perform arithmetic on constant value");
+            throw new TypeErrorException("can only perform arithmetic on constant int value");
         }
     }
 

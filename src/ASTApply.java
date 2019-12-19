@@ -23,7 +23,7 @@ public class ASTApply extends ASTNode {
             return functionValue.getBody().evaluate(internalEnv);
 
         }else {
-            throw new RuntimeException("a ConstantValue is not a function, it cannot be applied");
+            throw new TypeErrorException("a ConstantValue is not a function, it cannot be applied");
         }
     }
 
