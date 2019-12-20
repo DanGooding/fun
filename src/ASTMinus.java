@@ -6,7 +6,7 @@ public class ASTMinus extends ASTArith {
 
     @Override
     int operator(int leftOperand, int rightOperand) {
-        return  leftOperand - rightOperand;
+        return leftOperand - rightOperand;
     }
 
     @Override

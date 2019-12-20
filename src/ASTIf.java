@@ -11,7 +11,7 @@ public class ASTIf extends ASTNode {
     }
 
     @Override
-    Value evaluate(Environment env) {
+    Value evaluate(Environment env) throws EvaluationException {
         Value conditionValue = condition.evaluate(env);
 
         if (conditionValue instanceof BoolValue) {

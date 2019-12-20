@@ -1,4 +1,4 @@
-class ASTLiteralInt extends ASTNode {
+class ASTLiteralInt extends ASTMatchable {
     private final int value;
 
     ASTLiteralInt(int value) {
@@ -8,6 +8,15 @@ class ASTLiteralInt extends ASTNode {
     @Override
     IntValue evaluate(Environment env) {
         return new IntValue(this.value);
+    }
+
+    @Override
+    void bindMatch(Value subject, Environment env) throws PatternMatchException {
+        if (!(subject instanceof IntValue) ||
+            ((IntValue) subject).getValue() != this.value) {
+            // not an IntValue, or has a different value to this:
+            throw new PatternMatchException(this.toString());
+        }
     }
 
     @Override

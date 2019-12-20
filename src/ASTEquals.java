@@ -11,7 +11,7 @@ public class ASTEquals extends ASTNode {
     }
 
     @Override
-    BoolValue evaluate(Environment env) {
+    BoolValue evaluate(Environment env) throws EvaluationException {
         Value leftValue = left.evaluate(env);
         Value rightValue = right.evaluate(env);
 
@@ -35,6 +35,6 @@ public class ASTEquals extends ASTNode {
 
     @Override
     public String toString() {
-        return String.format("(%s = %s)", left, right);
+        return String.format("(%s == %s)", left, right);
     }
 }

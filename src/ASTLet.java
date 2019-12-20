@@ -1,27 +1,33 @@
 class ASTLet extends ASTNode {
-    // let name = <ast> in <ast>
+    // let <matchable> = <ast> in <ast>
 
-    private final String name;
+    private final ASTMatchable pattern;
     private final ASTNode assigned;
     private final ASTNode body;
 
-    ASTLet(String name, ASTNode assigned, ASTNode body) {
-        this.name = name;
+    ASTLet(ASTMatchable pattern, ASTNode assigned, ASTNode body) {
+        this.pattern = pattern;
         this.assigned = assigned;
         this.body = body;
     }
 
+    ASTLet(String name, ASTNode assigned, ASTNode body) {
+        this(new ASTVar(name), assigned, body);
+    }
+
     @Override
-    Value evaluate(Environment env) {
+    Value evaluate(Environment env) throws EvaluationException {
         Value assignedValue = assigned.evaluate(env);
 
-        Environment bodyEnv = env.withBinding(name, assignedValue);
+        Environment bodyEnv = new Environment(env);
+
+        pattern.bindMatch(assignedValue, bodyEnv);
 
         return body.evaluate(bodyEnv);
     }
 
     @Override
     public String toString() {
-        return String.format("(let %s = %s in %s)", name, assigned, body);
+        return String.format("(let %s = %s in %s)", pattern, assigned, body);
     }
 }

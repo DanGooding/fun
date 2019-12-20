@@ -1,18 +1,18 @@
 public class FunctionValue implements Value {
 
     // TODO: just make public & don't modify, don't use getters ?
-    private final String parameter;
+    private final ASTMatchable parameterPattern;
     private final ASTNode body;
     private final Environment capturedEnv;
 
-    public FunctionValue(String parameter, ASTNode body, Environment capturedEnv) {
-        this.parameter = parameter;
+    public FunctionValue(ASTMatchable parameterPattern, ASTNode body, Environment capturedEnv) {
+        this.parameterPattern = parameterPattern;
         this.body = body;
         this.capturedEnv = capturedEnv;
     }
 
-    public String getParameter() {
-        return parameter;
+    public ASTMatchable getParameterPattern() {
+        return parameterPattern;
     }
 
     public ASTNode getBody() {

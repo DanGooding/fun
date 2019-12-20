@@ -5,9 +5,9 @@ public abstract class ASTNode {
      * @param env a set of name bindings
      * @return the result of evaluation
      */
-    abstract Value evaluate(Environment env);
+    abstract Value evaluate(Environment env) throws EvaluationException;
 
-    public Value evaluate() {
+    public Value evaluate() throws EvaluationException {
         return evaluate(new Environment());
     }
 }

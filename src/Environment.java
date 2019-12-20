@@ -9,9 +9,19 @@ class Environment {
         bindings = new HashMap<>();
     }
 
+    /**
+     * shallow copy constructor
+     */
     Environment(Environment env) {
         // assumes `Value`s are immutable, doesn't deepcopy
         this.bindings = new HashMap<>(env.bindings);
+    }
+
+    /**
+     * mutating update
+     */
+    void bind(String name, Value value) {
+        bindings.put(name, value);
     }
 
     /**
@@ -20,7 +30,7 @@ class Environment {
      */
     Environment withBinding(String name, Value value) {
         Environment newEnv = new Environment(this);
-        newEnv.bindings.put(name, value);
+        newEnv.bind(name, value);
         return newEnv;
     }
 

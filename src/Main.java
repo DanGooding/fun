@@ -1,57 +1,61 @@
+import java.util.List;
+
 public class Main {
 
     public static void main(String[] args) {
 
-        // achieving recursion without the Y combinator
-        // using a let binding
+        // let (3, f, False, x) = (1 + 2, Fun (a, b) -> a * b, 1 == 2, 7)
+        // in f x 11
 
         ASTNode ast =
             new ASTLet(
-                "fac",
-                new ASTFun(
-                    "fac",
+                new ASTTuple(List.of(
+                    new ASTLiteralInt(3),
+                    new ASTVar("f"),
+                    new ASTLiteralBool(false),
+                    new ASTVar("x")
+                )),
+
+                new ASTTuple(List.of(
+                    new ASTPlus(
+                        new ASTLiteralInt(1),
+                        new ASTLiteralInt(2)
+                    ),
                     new ASTFun(
-                        "n",
-
-                        new ASTIf(
-                            new ASTEquals(
-                                new ASTVar("n"),
-                                new ASTLiteralInt(0)
-                            ),
-
-                            new ASTLiteralInt(1),
-
-                            // n * fac fac (n - 1)
-                            new ASTMult(
-                                new ASTVar("n"),
-                                new ASTApply(
-                                    new ASTApply(
-                                        new ASTVar("fac"),
-                                        new ASTVar("fac")
-                                    ),
-                                    new ASTMinus(
-                                        new ASTVar("n"),
-                                        new ASTLiteralInt(1)
-                                    )
-                                )
-                            )
+                        new ASTTuple(List.of(
+                            new ASTVar("a"),
+                            new ASTVar("b")
+                        )),
+                        new ASTMult(
+                            new ASTVar("a"),
+                            new ASTVar("b")
                         )
-                    )
-                ),
+                    ),
+                    new ASTEquals(
+                        new ASTLiteralInt(1),
+                        new ASTLiteralInt(2)
+                    ),
+                    new ASTLiteralInt(7)
+                )),
 
                 new ASTApply(
-                    new ASTApply(
-                        new ASTVar("fac"),
-                        new ASTVar("fac")
-                    ),
-                    new ASTLiteralInt(30)
+                    new ASTVar("f"),
+                    new ASTTuple(List.of(
+                        new ASTVar("x"),
+                        new ASTLiteralInt(11)
+                    ))
                 )
             );
 
         System.out.println(ast);
 
-        IntValue result = (IntValue) ast.evaluate();
+        try {
+            Value result = ast.evaluate();
+            System.out.println(result);
 
-        System.out.println(result.getValue());
+        } catch (EvaluationException e) {
+            System.out.println(e);
+        }
+
     }
 }

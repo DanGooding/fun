@@ -9,7 +9,7 @@ public class ASTApply extends ASTNode {
     }
 
     @Override
-    Value evaluate(Environment env) {
+    Value evaluate(Environment env) throws EvaluationException {
         Value argumentValue = argument.evaluate(env);
         Value possibleFunctionValue = function.evaluate(env);
 
@@ -17,14 +17,15 @@ public class ASTApply extends ASTNode {
             // TODO: this is awful naming
             FunctionValue funObj = (FunctionValue) possibleFunctionValue;
 
-            Environment internalEnv =
-                funObj.getCapturedEnv().withBinding(funObj.getParameter(), argumentValue);
+            Environment internalEnv = new Environment(funObj.getCapturedEnv());
+
+            funObj.getParameterPattern().bindMatch(argumentValue, internalEnv);
 
             return funObj.getBody().evaluate(internalEnv);
 
         }else {
 
-            throw new TypeErrorException("a ConstantValue is not a function, it cannot be applied");
+            throw new TypeErrorException("cannot apply a non-FunctionValue");
         }
     }
 

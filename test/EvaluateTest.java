@@ -1,12 +1,13 @@
-import junit.framework.TestCase;
 import org.junit.Test;
+
+import java.util.function.IntBinaryOperator;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class EvaluateTest {
 
     @Test
-    public void addition_worksCorrectly() {
+    public void addition_worksCorrectly() throws EvaluationException {
         // ARRANGE
         ASTNode ast =
             new ASTPlus(
@@ -23,12 +24,12 @@ public class EvaluateTest {
     }
 
     @Test
-    public void multiplication_worksCorrectly() {
+    public void subtraction_worksCorrectly() throws EvaluationException {
         // ARRANGE
         ASTNode ast =
-            new ASTMult(
-                new ASTLiteralInt(2),
-                new ASTLiteralInt(3)
+            new ASTMinus(
+                new ASTLiteralInt(5),
+                new ASTLiteralInt(7)
             );
 
         // ACT
@@ -36,11 +37,28 @@ public class EvaluateTest {
 
         // ASSERT
         assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(6);
+        assertThat(((IntValue) result).getValue()).isEqualTo(-2);
     }
 
     @Test
-    public void nestedLet_worksCorrectly() {
+    public void multiplication_worksCorrectly() throws EvaluationException {
+        // ARRANGE
+        ASTNode ast =
+            new ASTMult(
+                new ASTLiteralInt(3),
+                new ASTLiteralInt(13)
+            );
+
+        // ACT
+        Value result = ast.evaluate();
+
+        // ASSERT
+        assertThat(result).isInstanceOf(IntValue.class);
+        assertThat(((IntValue) result).getValue()).isEqualTo(39);
+    }
+
+    @Test
+    public void nestedLet_worksCorrectly() throws EvaluationException {
         // ARRANGE
         // let x = 2 in let y = x * x in let z = x * y in x + y + z
         ASTNode ast =
@@ -80,7 +98,34 @@ public class EvaluateTest {
     }
 
     @Test
-    public void currying_worksCorrectly() {
+    public void innerLet_doesntAffectOuterLetEnvironment() throws EvaluationException {
+        // ARRANGE
+
+        // let x = 1 in (let x = 2 in 0) + x
+        ASTNode ast =
+            new ASTLet(
+                "x",
+                new ASTLiteralInt(1),
+                new ASTPlus(
+                    new ASTLet(
+                        "x",
+                        new ASTLiteralInt(2),
+                        new ASTLiteralInt(0)
+                    ),
+                    new ASTVar("x")
+                )
+            );
+
+        // ACT
+        Value result = ast.evaluate();
+
+        // ASSERT
+        assertThat(result).isInstanceOf(IntValue.class);
+        assertThat(((IntValue) result).getValue()).isEqualTo(1);
+    }
+
+    @Test
+    public void currying_worksCorrectly() throws EvaluationException {
         // ARRANGE
 
         // let add = fun x -> fun y -> x + y
@@ -122,10 +167,9 @@ public class EvaluateTest {
     }
 
     @Test
-    public void functionScoping_isStatic() {
+    public void functionScoping_isStatic() throws EvaluationException {
         // ARRANGE
 
-        // TODO: first make test for name collisions
         // let x = 1
         //  in let f = fun y -> x + y
         //   in let x = 2
@@ -163,66 +207,5 @@ public class EvaluateTest {
         assertThat(((IntValue) result).getValue()).isEqualTo(1);
 
     }
-
-    @Test
-    public void if_takesTrueBranch_forTrue() {
-        // ARRANGE
-        ASTNode ast = new ASTIf(
-            new ASTLiteralBool(true),
-            new ASTLiteralInt(1),
-            new ASTLiteralInt(0)
-        );
-
-        // ACT
-        Value result = ast.evaluate();
-
-        // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(1);
-    }
-
-    @Test
-    public void if_takesFalseBranch_forFalse() {
-        // ARRANGE
-        ASTNode ast = new ASTIf(
-            new ASTLiteralBool(false),
-            new ASTLiteralInt(1),
-            new ASTLiteralInt(0)
-        );
-
-        // ACT
-        Value result = ast.evaluate();
-
-        // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(0);
-    }
-
-    @Test
-    public void if_onlyEvaluates_oneBranch() {
-        // ARRANGE
-        ASTNode ast =
-            new ASTIf(
-                new ASTLiteralBool(false),
-                new ASTLiteralInt(0) {
-                    @Override
-                    IntValue evaluate(Environment env) {
-                        TestCase.fail();  // this should not be evaluated, fail the test if it is
-                        return super.evaluate(env);
-                    }
-                },
-                new ASTLiteralInt(0)
-            );
-
-        // ACT
-        Value result = ast.evaluate();
-
-        // ASSERT
-
-    }
-
-
-
-
 
 }

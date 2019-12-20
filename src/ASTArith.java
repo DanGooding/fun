@@ -1,4 +1,3 @@
-import java.util.Iterator;
 
 abstract class ASTArith extends ASTNode {
 
@@ -10,13 +9,12 @@ abstract class ASTArith extends ASTNode {
         this.right = right;
     }
 
-    // TODO: should this operate on ConstantValue ?
     abstract int operator(int leftOperand, int rightOperand);
 
     abstract String operatorSymbol();
 
     @Override
-    IntValue evaluate(Environment env) {
+    IntValue evaluate(Environment env) throws EvaluationException {
         Value leftValue = left.evaluate(env);
         Value rightValue = right.evaluate(env);
 

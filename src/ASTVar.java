@@ -1,4 +1,4 @@
-class ASTVar extends ASTNode {
+class ASTVar extends ASTMatchable {
     private final String name;
 
     ASTVar(String name) {
@@ -6,11 +6,17 @@ class ASTVar extends ASTNode {
     }
 
     @Override
-    Value evaluate(Environment env) {
+    Value evaluate(Environment env) throws EvaluationException {
         if (env.hasName(name)) {
             return env.lookup(name);
         }
-        throw new TypeErrorException(String.format("unbound variable '%s'", name));
+        // TODO: specialise NameError or something?
+        throw new EvaluationException(String.format("unbound variable '%s'", name));
+    }
+
+    @Override
+    void bindMatch(Value subject, Environment env) {
+        env.bind(name, subject);
     }
 
     @Override
