@@ -9,4 +9,9 @@ public class ASTLiteralBool extends ASTNode {
     BoolValue evaluate(Environment env) {
         return new BoolValue(value);
     }
+
+    @Override
+    public String toString() {
+        return value ? "True" : "False";
+    }
 }

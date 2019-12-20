@@ -10,4 +10,9 @@ public class BoolValue implements ConstantValue {
     public boolean getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return value ? "True" : "False";
+    }
 }
