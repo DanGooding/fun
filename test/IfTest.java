@@ -56,7 +56,7 @@ public class IfTest {
             );
 
         // ACT
-        Value result = ast.evaluate();
+        ast.evaluate();
     }
 
     @Test
@@ -76,7 +76,7 @@ public class IfTest {
             );
 
         // ACT
-        Value result = ast.evaluate();
+        ast.evaluate();
     }
 
 

@@ -1,4 +1,3 @@
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.util.List;
@@ -38,7 +37,7 @@ public class PatternMatchTest {
 
     }
 
-    @Test(expected = PatternMatchException.class)
+    @Test(expected = EvaluationException.class)
     public void fails_forUnequalPrimitives() throws EvaluationException {
         // ARRANGE
         // let (1, 2) = (1, 3) in 0
@@ -59,7 +58,7 @@ public class PatternMatchTest {
         ast.evaluate();
     }
 
-    @Test(expected = PatternMatchException.class)
+    @Test(expected = EvaluationException.class)
     public void fails_forPatternLonger() throws EvaluationException {
         // ARRANGE
         // let (1, 2, 3) = (1, 2) in 0
@@ -81,7 +80,7 @@ public class PatternMatchTest {
         ast.evaluate();
     }
 
-    @Test(expected = PatternMatchException.class)
+    @Test(expected = EvaluationException.class)
     public void fails_forPatternShorter() throws EvaluationException {
         // ARRANGE
         // let (1, 2) = (1, 2, 3) in 0
@@ -201,7 +200,8 @@ public class PatternMatchTest {
 
     }
 
-    @Test  // TODO: give this a dedicated exception type + ensure it is caught at parse time
+    // TODO: give this a dedicated exception type + ensure it is caught at parse time
+    @Test(expected = UnsupportedOperationException.class)
     public void fails_forNonMatchableTupleElement() throws EvaluationException {
         // ARRANGE
         // let (1, x + 2) = (1, 4) in 0
@@ -221,18 +221,11 @@ public class PatternMatchTest {
                 new ASTLiteralInt(0)
             );
 
-        // ACT + ASSERT
-        try {
-            ast.evaluate();
-            TestCase.fail("expected exception");
-        } catch(EvaluationException e) {
-            if (e instanceof PatternMatchException) {
-                TestCase.fail("wrong exception type - invalid pattern, not a match failure");
-            }
-        }
+        // ACT
+        ast.evaluate();
     }
 
-    @Test //(expected = EvaluationException.class) // TODO: make a dedicated exception subtype
+    @Test(expected = EvaluationException.class) // TODO: make a dedicated exception subtype
     public void throwsSuitable_OnMultipleAssignmentsToSameVariable() throws EvaluationException {
         // ARRANGE
 
@@ -264,17 +257,7 @@ public class PatternMatchTest {
             );
 
         // ACT + ASSERT
-        try {
-            ast.evaluate();
-            TestCase.fail("exception expected"); // expected an exception
-        } catch(EvaluationException e) {
-            if (e instanceof PatternMatchException) {
-                // PatternMatchException indicates a correctly formed pattern that didn't match
-                // actually have an incorrectly formed pattern
-                TestCase.fail("wrong exception type - illegal operation, not match failure");
-            }
-        }
-
+        ast.evaluate();
     }
 
     // TODO: add more extensive tests of these / else abstract the matching part
@@ -308,6 +291,7 @@ public class PatternMatchTest {
         assertThat(result).isInstanceOf(IntValue.class);
         assertThat(((IntValue) result).getValue()).isEqualTo(-1);
     }
+
 
 
 

@@ -19,12 +19,16 @@ public class ASTApply extends ASTNode {
 
             Environment internalEnv = new Environment(funObj.getCapturedEnv());
 
-            funObj.getParameterPattern().bindMatch(argumentValue, internalEnv);
+            try {
+                funObj.getParameterPattern().bindMatch(argumentValue, internalEnv);
+            } catch (PatternMatchFailedException e) {
+                // TODO: more useful error message / specialised exception
+                throw new EvaluationException("pattern match failed in function");
+            }
 
             return funObj.getBody().evaluate(internalEnv);
 
         }else {
-
             throw new TypeErrorException("cannot apply a non-FunctionValue");
         }
     }

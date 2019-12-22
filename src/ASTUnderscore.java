@@ -10,11 +10,12 @@ public class ASTUnderscore extends ASTMatchable {
     }
 
     @Override
-    void bindMatch(Value subject, Environment env) throws PatternMatchException {
+    void bindMatch(Value subject, Environment env) {
         // do nothing - match always succeeds, matched value discarded
         // if was lazy, wouldn't evaluate subject to a value
     }
 
+    // TODO: ensure '_' is not a valid name
     @Override
     public String toString() {
         return "_";

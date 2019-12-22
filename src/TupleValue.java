@@ -3,7 +3,7 @@ import java.util.stream.Collectors;
 
 public class TupleValue implements ConstantValue {
 
-    List<Value> elements;
+    private final List<Value> elements;
 
     TupleValue(List<Value> elements) {
         this.elements = List.copyOf(elements);

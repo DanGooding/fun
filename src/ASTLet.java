@@ -18,10 +18,14 @@ class ASTLet extends ASTNode {
     @Override
     Value evaluate(Environment env) throws EvaluationException {
         Value assignedValue = assigned.evaluate(env);
-
         Environment bodyEnv = new Environment(env);
 
-        pattern.bindMatch(assignedValue, bodyEnv);
+        try {
+            pattern.bindMatch(assignedValue, bodyEnv);
+
+        } catch (PatternMatchFailedException e) {
+            throw new EvaluationException(e.getMessage());
+        }
 
         return body.evaluate(bodyEnv);
     }

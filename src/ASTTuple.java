@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 
 public class ASTTuple extends ASTMatchable {
 
-    private List<ASTNode> elements;
+    private final List<ASTNode> elements;
 
     public ASTTuple(List<ASTNode> elements) {
 //        if (contents.length == 1) {
@@ -34,21 +34,20 @@ public class ASTTuple extends ASTMatchable {
     }
 
     @Override
-    void bindMatch(Value subject, Environment env) throws PatternMatchException {
+    void bindMatch(Value subject, Environment env) throws PatternMatchFailedException {
         if (!(subject instanceof TupleValue)) {
-            throw new PatternMatchException("tuple expected, got " + subject);
+            throw new PatternMatchFailedException("tuple expected, got " + subject);
         }
         TupleValue tupleSubject = (TupleValue) subject;
         if (tupleSubject.size() != this.size()) {
-            throw new PatternMatchException(String.format(
+            throw new PatternMatchFailedException(String.format(
                 "%d-tuple expected, got %d-tuple", this.size(), ((TupleValue) subject).size()));
         }
         for (int i = 0; i < size(); i++) {
             ASTNode element = elements.get(i);
             if (!(element instanceof ASTMatchable)) {
-                // TODO: this is an error not a pattern match exception
-                //  the user's code is wrong if they try and
-                throw new PatternMatchException("cannot match against " + subject);
+                // TODO: this is an error the user's code is wrong - is this caught at parse time?
+                throw new UnsupportedOperationException("cannot match against " + subject);
             }
             ((ASTMatchable) element).bindMatch(tupleSubject.getElement(i), env);
         }
