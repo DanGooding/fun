@@ -1,7 +1,6 @@
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import java.nio.channels.MulticastChannel;
 import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -286,7 +285,7 @@ public class PatternMatchTest {
         // (fun (a, b) -> a - b) (2, 3)
         ASTNode ast =
             new ASTApply(
-                new ASTFun(
+                new ASTLambda(
                     new ASTTuple(List.of(
                         new ASTVar("a"),
                         new ASTVar("b")

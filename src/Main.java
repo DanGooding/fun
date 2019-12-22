@@ -22,7 +22,7 @@ public class Main {
                         new ASTLiteralInt(1),
                         new ASTLiteralInt(2)
                     ),
-                    new ASTFun(
+                    new ASTLambda(
                         new ASTTuple(List.of(
                             new ASTVar("a"),
                             new ASTVar("b")

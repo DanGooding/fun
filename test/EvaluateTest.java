@@ -1,7 +1,5 @@
 import org.junit.Test;
 
-import java.util.function.IntBinaryOperator;
-
 import static com.google.common.truth.Truth.assertThat;
 
 public class EvaluateTest {
@@ -135,9 +133,9 @@ public class EvaluateTest {
         ASTNode ast =
             new ASTLet(
                 "add",
-                new ASTFun(
+                new ASTLambda(
                     "x",
-                    new ASTFun(
+                    new ASTLambda(
                         "y",
                         new ASTPlus(
                             new ASTVar("x"),
@@ -181,7 +179,7 @@ public class EvaluateTest {
                 new ASTLiteralInt(1),
                 new ASTLet(
                     "f",
-                    new ASTFun(
+                    new ASTLambda(
                         "y",
                         new ASTPlus(
                             new ASTVar("x"),
