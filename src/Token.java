@@ -1,5 +1,6 @@
 public class Token {
 
+    // TODO: should these be private with getters?
     final TokenType type;
     final String string;
 

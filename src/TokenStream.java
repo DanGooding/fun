@@ -24,6 +24,9 @@ public class TokenStream {
         inputStream = new CharStream(input);
     }
 
+    /**
+     * get the next token, advancing. returns EOF when reaches end of input
+     */
     Token nextToken() {
         if (inputStream.atEOF()) {
             return new Token(TokenType.EOF);
@@ -42,7 +45,7 @@ public class TokenStream {
             return readOperator();
 
         }else if (c == '(') {
-            inputStream.nextChar();
+            inputStream.nextChar(); // advance
             return new Token(TokenType.OPEN_BRACKET);
 
         }else if (c == ')') {
@@ -52,6 +55,10 @@ public class TokenStream {
         }else if (c == ',') {
             inputStream.nextChar();
             return new Token(TokenType.COMMA);
+
+        }else if (c == '_') {
+            inputStream.nextChar();
+            return new Token(TokenType.UNDERSCORE);
 
         }else if (c == '\n') { // TODO: allow windows CRLF \r\n (just discard \r ?)
             inputStream.nextChar();
@@ -90,6 +97,7 @@ public class TokenStream {
     }
 
     private Token readName() {
+        // just use readWhile ?
         String name = readAtLeastOneWhile(this::isNameChar);
 
         if (keywords.containsKey(name)) {

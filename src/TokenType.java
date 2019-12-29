@@ -30,6 +30,7 @@ public enum TokenType {
 
     COMMA,
 
+    UNDERSCORE,
 
     NEWLINE,
 

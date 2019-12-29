@@ -9,16 +9,21 @@ public class Main {
         try {
             String content = Files.readString(Paths.get("program.txt"));
 
-            TokenStream ts = new TokenStream(content);
+            Parser p = new Parser(content);
 
-            Token t;
-            do {
-                t = ts.nextToken();
-                System.out.println(t);
+            ASTNode expr = p.parseExpr();
 
-            } while (t.type != TokenType.EOF);
+            System.out.println(expr);
 
-        }catch (IOException e) {
+            try {
+                Value result = expr.evaluate();
+                System.out.println(result);
+
+            } catch (EvaluationException e) {
+                System.out.println(e);
+            }
+
+        } catch (IOException e) {
             System.out.println(e);
         }
 
