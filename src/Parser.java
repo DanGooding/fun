@@ -93,6 +93,7 @@ public class Parser {
     }
 
     private ASTLiteralInt parseInt() {
+        // TODO: should this check the token type? (like other parse_ functions)
         ASTLiteralInt result = new ASTLiteralInt(Integer.parseInt(currentToken.string));
         advance();
         return result;

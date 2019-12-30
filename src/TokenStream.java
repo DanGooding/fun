@@ -56,7 +56,7 @@ public class TokenStream {
             inputStream.nextChar();
             return new Token(TokenType.COMMA);
 
-        }else if (c == '_') {
+        }else if (c == '_') { // TODO: combine this with readName ?
             inputStream.nextChar();
             return new Token(TokenType.UNDERSCORE);
 
