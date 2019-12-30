@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Parser {
 
     private final TokenStream tokenStream;
@@ -21,6 +24,9 @@ public class Parser {
             advance();
         }else {
             // TODO: proper exception type (checked?)
+            // the expected token is possibly not the most useful thing, eg:
+            // let t = (1, 2 in t
+            // gives 'expected COMMA', rather than close bracket
             throw new RuntimeException(String.format("parse error, %s expected", type));
         }
     }
@@ -37,13 +43,8 @@ public class Parser {
             case NAME:
                 return parseName();
 
-            case OPEN_BRACKET: {
-                // TODO: may be a tuple
-                eat(TokenType.OPEN_BRACKET);
-                ASTNode result = parseExpr();
-                eat(TokenType.CLOSE_BRACKET);
-                return result;
-            }
+            case OPEN_BRACKET:
+                return parseBracketedExpr();
 
             case LET: {
                 eat(TokenType.LET);
@@ -78,18 +79,72 @@ public class Parser {
         }
     }
 
-    private ASTMatchable parsePattern() {
-        if (currentToken.type == TokenType.NAME) {
-            return parseName();
-        }else if (currentToken.type == TokenType.UNDERSCORE) {
-            advance();
-            return new ASTUnderscore();
-        }else if (currentToken.type == TokenType.INTEGER) {
-            return parseInt();
-        }
-        // TODO: allow tuples
+    private ASTNode parseBracketedExpr() {
+        eat(TokenType.OPEN_BRACKET);
 
-        throw new RuntimeException("parse error in pattern");
+        List<ASTNode> exprs = new ArrayList<>();
+        while (currentToken.type != TokenType.CLOSE_BRACKET) {
+            if (exprs.size() > 0) {
+                eat(TokenType.COMMA);
+            }
+            exprs.add(parseExpr());
+        }
+        eat(TokenType.CLOSE_BRACKET);
+
+        if (exprs.size() == 1) { // a bracketed expression
+            return exprs.get(0);
+        }else { // a tuple of 0, 2, 3, ... elements
+            return new ASTTuple(exprs);
+        }
+    }
+
+    private ASTMatchable parsePattern() {
+
+        switch (currentToken.type) {
+            case NAME:
+                return parseName();
+
+            case UNDERSCORE:
+                eat(TokenType.UNDERSCORE);
+                return new ASTUnderscore();
+
+            case INTEGER:
+                return parseInt();
+
+            case OPEN_BRACKET:
+                return parseBracketedPattern();
+
+            default:
+                throw new RuntimeException("parse error in pattern");
+        }
+    }
+
+    private ASTMatchable parseBracketedPattern() {
+        eat(TokenType.OPEN_BRACKET);
+
+        List<ASTMatchable> patterns = new ArrayList<>();
+        while (currentToken.type != TokenType.CLOSE_BRACKET) {
+            if (patterns.size() > 0) {
+                eat(TokenType.COMMA);
+            }
+            patterns.add(parsePattern());
+        }
+        eat(TokenType.CLOSE_BRACKET);
+
+        if (patterns.size() == 1) { // just a random pair of brackets, ignore
+            // TODO: matching against constructors here
+            return patterns.get(0);
+
+        }else { // a tuple
+            // TODO: separate tuplePattern and tupleConstructor types would make this cleaner
+            // List<B> is not a subtype of List<A>
+            // even when B is a subtype of A
+            // so cannot just: return new ASTTuple(elements);
+
+            List<ASTNode> elements = new ArrayList<>(patterns.size());
+            elements.addAll(patterns);
+            return new ASTTuple(elements);
+        }
     }
 
     private ASTLiteralInt parseInt() {
