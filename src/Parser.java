@@ -98,6 +98,7 @@ public class Parser {
         }
     }
 
+    // TODO: add grammar to each parse function's documentation
     private ASTMatchable parsePattern() {
 
         switch (currentToken.type) {
@@ -148,16 +149,15 @@ public class Parser {
     }
 
     private ASTLiteralInt parseInt() {
-        // TODO: should this check the token type? (like other parse_ functions)
-        ASTLiteralInt result = new ASTLiteralInt(Integer.parseInt(currentToken.string));
-        advance();
-        return result;
+        Token t = currentToken;
+        eat(TokenType.INTEGER);
+        return new ASTLiteralInt(Integer.parseInt(t.string));
     }
 
     private ASTVar parseName() {
-        ASTVar result = new ASTVar(currentToken.string);
-        advance();
-        return result;
+        Token t = currentToken;
+        eat(TokenType.NAME);
+        return new ASTVar(t.string);
     }
 
 
