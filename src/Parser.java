@@ -11,6 +11,9 @@ public class Parser {
         advance();
     }
 
+    /**
+     * move one token forward in the stream
+     */
     private void advance() {
         currentToken = tokenStream.nextToken();
     }
@@ -33,7 +36,7 @@ public class Parser {
 
     // TODO: top level: multiple expressions - this requires changes to the AST too
 
-    // TODO: make private, except
+    // TODO: make private, all except a root parseProgram function
     ASTNode parseExpr() {
 
         switch (currentToken.type) {
@@ -124,9 +127,10 @@ public class Parser {
         eat(TokenType.OPEN_BRACKET);
 
         List<ASTMatchable> patterns = new ArrayList<>();
+
         while (currentToken.type != TokenType.CLOSE_BRACKET) {
             if (patterns.size() > 0) {
-                eat(TokenType.COMMA);
+                eat(TokenType.COMMA);  // a comma before each list element except the first
             }
             patterns.add(parsePattern());
         }
@@ -138,8 +142,7 @@ public class Parser {
 
         }else { // a tuple
             // TODO: separate tuplePattern and tupleConstructor types would make this cleaner
-            // List<B> is not a subtype of List<A>
-            // even when B is a subtype of A
+            // List<B> is not a subtype of List<A>, even when B is a subtype of A
             // so cannot just: return new ASTTuple(elements);
 
             List<ASTNode> elements = new ArrayList<>(patterns.size());
