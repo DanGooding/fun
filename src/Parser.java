@@ -40,14 +40,6 @@ public class Parser {
     ASTNode parseExpr() {
 
         switch (currentToken.type) {
-            case INTEGER:
-                return parseInt();
-
-            case NAME:
-                return parseName();
-
-            case OPEN_BRACKET:
-                return parseBracketedExpr();
 
             case LET: {
                 eat(TokenType.LET);
@@ -77,9 +69,66 @@ public class Parser {
                 return new ASTLambda(param, body);
             }
 
-            default:
-                throw new RuntimeException("parse error in expression");
+            default: {
+                if (currentBeginsBaseExpr()) {
+                    return parseApplication();
+                }else {
+                    throw new RuntimeException("parse error in expression");
+                }
+            }
         }
+    }
+
+    private ASTNode parseApplication() {
+        // a base expression, applied to zero or more base expressions
+
+        // app = app baseExpr
+        //     | baseExpr
+
+        ASTNode first = parseBaseExpr();  // TODO: custom here to avoid literals ?
+
+        List<ASTNode> args = new ArrayList<>();
+        while (currentBeginsBaseExpr()) {
+            args.add(parseBaseExpr());
+        }
+
+        ASTNode app = first;
+        for (ASTNode arg : args) {
+            app = new ASTApply(app, arg);
+        }
+
+        return app;
+    }
+
+    private boolean currentBeginsBaseExpr() {
+        switch (currentToken.type) {
+            case INTEGER:
+            case NAME:
+            case OPEN_BRACKET:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private ASTNode parseBaseExpr() {
+        // a base expression is anything that can be an argument to a function or operation
+        // without needing extra brackets for precedence to work
+
+        switch (currentToken.type) {
+            case INTEGER:
+                return parseInt();
+
+            case NAME:
+                return parseName();
+
+            case OPEN_BRACKET:
+                return parseBracketedExpr();
+
+            default:
+                throw new RuntimeException("parse error in (base) expression");
+        }
+
     }
 
     private ASTNode parseBracketedExpr() {
