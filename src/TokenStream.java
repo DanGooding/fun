@@ -15,7 +15,7 @@ public class TokenStream {
             "lambda", TokenType.LAMBDA
         );
 
-    private static final String operatorChars = "+-*=>";
+    private static final String operatorChars = "+-*^=>";
 
 
     private CharStream inputStream;
