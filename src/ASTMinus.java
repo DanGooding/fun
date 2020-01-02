@@ -1,3 +1,5 @@
+import java.math.BigInteger;
+
 public class ASTMinus extends ASTArith {
 
     ASTMinus(ASTNode left, ASTNode right) {
@@ -5,8 +7,8 @@ public class ASTMinus extends ASTArith {
     }
 
     @Override
-    int operator(int leftOperand, int rightOperand) {
-        return leftOperand - rightOperand;
+    BigInteger operator(BigInteger leftOperand, BigInteger rightOperand) {
+        return leftOperand.subtract(rightOperand);
     }
 
     @Override

@@ -22,8 +22,8 @@ public class ASTEquals extends ASTNode {
             if (leftValue instanceof BoolValue && rightValue instanceof BoolValue) {
                 return new BoolValue(((BoolValue) leftValue).getValue() == ((BoolValue) rightValue).getValue());
 
-            }else if (leftValue instanceof IntValue && rightValue instanceof IntValue) {
-                return new BoolValue(((IntValue) leftValue).getValue() == ((IntValue) rightValue).getValue());
+            }else if (leftValue instanceof IntegerValue && rightValue instanceof IntegerValue) {
+                return new BoolValue(((IntegerValue) leftValue).getValue().equals(((IntegerValue) rightValue).getValue()));
 
             }else {
                 throw new TypeErrorException("cannot equate values of different type");

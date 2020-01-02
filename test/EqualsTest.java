@@ -11,8 +11,8 @@ public class EqualsTest {
         // ARRANGE
         ASTNode ast =
             new ASTEquals(
-                new ASTLiteralInt(1),
-                new ASTLiteralInt(1)
+                new ASTLiteralInteger(1),
+                new ASTLiteralInteger(1)
             );
 
         // ACT
@@ -28,8 +28,8 @@ public class EqualsTest {
         // ARRANGE
         ASTNode ast =
             new ASTEquals(
-                new ASTLiteralInt(1),
-                new ASTLiteralInt(2)
+                new ASTLiteralInteger(1),
+                new ASTLiteralInteger(2)
             );
 
         // ACT
@@ -45,7 +45,7 @@ public class EqualsTest {
         // ARRANGE
         ASTNode ast =
             new ASTEquals(
-                new ASTLiteralInt(3),
+                new ASTLiteralInteger(3),
                 new ASTLiteralBool(true)
             );
 
@@ -60,20 +60,20 @@ public class EqualsTest {
         ASTNode ast =
             new ASTEquals(
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(10),
+                    new ASTLiteralInteger(10),
                     new ASTLiteralBool(false),
                     new ASTTuple(List.of()),
                     new ASTTuple(List.of(
-                        new ASTLiteralInt(3),
+                        new ASTLiteralInteger(3),
                         new ASTLiteralBool(true)
                     ))
                 )),
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(10),
+                    new ASTLiteralInteger(10),
                     new ASTLiteralBool(false),
                     new ASTTuple(List.of()),
                     new ASTTuple(List.of(
-                        new ASTLiteralInt(3),
+                        new ASTLiteralInteger(3),
                         new ASTLiteralBool(true)
                     ))
                 ))

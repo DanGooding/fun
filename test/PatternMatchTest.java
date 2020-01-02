@@ -14,26 +14,26 @@ public class PatternMatchTest {
         ASTNode ast =
             new ASTLet(
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
+                    new ASTLiteralInteger(1),
                     new ASTLiteralBool(false),
-                    new ASTLiteralInt(3),
+                    new ASTLiteralInteger(3),
                     new ASTLiteralBool(true)
                 )),
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
+                    new ASTLiteralInteger(1),
                     new ASTLiteralBool(false),
-                    new ASTLiteralInt(3),
+                    new ASTLiteralInteger(3),
                     new ASTLiteralBool(true)
                 )),
-                new ASTLiteralInt(0)
+                new ASTLiteralInteger(0)
             );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(0);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(0);
 
     }
 
@@ -44,14 +44,14 @@ public class PatternMatchTest {
         ASTNode ast =
             new ASTLet(
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
-                    new ASTLiteralInt(2)
+                    new ASTLiteralInteger(1),
+                    new ASTLiteralInteger(2)
                 )),
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
-                    new ASTLiteralInt(3)
+                    new ASTLiteralInteger(1),
+                    new ASTLiteralInteger(3)
                 )),
-                new ASTLiteralInt(0)
+                new ASTLiteralInteger(0)
             );
 
         // ACT
@@ -65,15 +65,15 @@ public class PatternMatchTest {
         ASTNode ast =
             new ASTLet(
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
-                    new ASTLiteralInt(2),
-                    new ASTLiteralInt(3)
+                    new ASTLiteralInteger(1),
+                    new ASTLiteralInteger(2),
+                    new ASTLiteralInteger(3)
                 )),
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
-                    new ASTLiteralInt(2)
+                    new ASTLiteralInteger(1),
+                    new ASTLiteralInteger(2)
                 )),
-                new ASTLiteralInt(0)
+                new ASTLiteralInteger(0)
             );
 
         // ACT
@@ -87,15 +87,15 @@ public class PatternMatchTest {
         ASTNode ast =
             new ASTLet(
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
-                    new ASTLiteralInt(2)
+                    new ASTLiteralInteger(1),
+                    new ASTLiteralInteger(2)
                 )),
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
-                    new ASTLiteralInt(2),
-                    new ASTLiteralInt(3)
+                    new ASTLiteralInteger(1),
+                    new ASTLiteralInteger(2),
+                    new ASTLiteralInteger(3)
                 )),
-                new ASTLiteralInt(0)
+                new ASTLiteralInteger(0)
             );
 
         // ACT
@@ -109,15 +109,15 @@ public class PatternMatchTest {
             new ASTLet(
                 ASTTuple.unit(),
                 ASTTuple.unit(),
-                new ASTLiteralInt(0)
+                new ASTLiteralInteger(0)
             );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(0);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(0);
     }
 
     @Test
@@ -128,46 +128,46 @@ public class PatternMatchTest {
         ASTNode ast =
             new ASTLet(
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
+                    new ASTLiteralInteger(1),
                     new ASTTuple(List.of(
-                        new ASTLiteralInt(2),
+                        new ASTLiteralInteger(2),
                         new ASTTuple(List.of(
-                            new ASTLiteralInt(3),
-                            new ASTLiteralInt(4)
+                            new ASTLiteralInteger(3),
+                            new ASTLiteralInteger(4)
                         )),
-                        new ASTLiteralInt(5)
+                        new ASTLiteralInteger(5)
                     )),
                     new ASTTuple(List.of(
-                        new ASTLiteralInt(6),
-                        new ASTLiteralInt(7)
+                        new ASTLiteralInteger(6),
+                        new ASTLiteralInteger(7)
                     ))
                 )),
 
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
+                    new ASTLiteralInteger(1),
                     new ASTTuple(List.of(
-                        new ASTLiteralInt(2),
+                        new ASTLiteralInteger(2),
                         new ASTTuple(List.of(
-                            new ASTLiteralInt(3),
-                            new ASTLiteralInt(4)
+                            new ASTLiteralInteger(3),
+                            new ASTLiteralInteger(4)
                         )),
-                        new ASTLiteralInt(5)
+                        new ASTLiteralInteger(5)
                     )),
                     new ASTTuple(List.of(
-                        new ASTLiteralInt(6),
-                        new ASTLiteralInt(7)
+                        new ASTLiteralInteger(6),
+                        new ASTLiteralInteger(7)
                     ))
                 )),
 
-                new ASTLiteralInt(0)
+                new ASTLiteralInteger(0)
             );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(0);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(0);
 
     }
 
@@ -182,8 +182,8 @@ public class PatternMatchTest {
                     new ASTVar("y")
                 )),
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(10),
-                    new ASTLiteralInt(2)
+                    new ASTLiteralInteger(10),
+                    new ASTLiteralInteger(2)
                 )),
                 new ASTMinus(
                     new ASTVar("x"),
@@ -195,8 +195,8 @@ public class PatternMatchTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(8);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(8);
 
     }
 
@@ -208,17 +208,17 @@ public class PatternMatchTest {
         ASTNode ast =
             new ASTLet(
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
+                    new ASTLiteralInteger(1),
                     new ASTPlus(
                         new ASTVar("x"),
-                        new ASTLiteralInt(2)
+                        new ASTLiteralInteger(2)
                     )
                 )),
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(1),
-                    new ASTLiteralInt(4)
+                    new ASTLiteralInteger(1),
+                    new ASTLiteralInteger(4)
                 )),
-                new ASTLiteralInt(0)
+                new ASTLiteralInteger(0)
             );
 
         // ACT
@@ -235,7 +235,7 @@ public class PatternMatchTest {
             new ASTLet(
                 new ASTTuple(List.of(
                     new ASTTuple(List.of(
-                        new ASTLiteralInt(1),
+                        new ASTLiteralInteger(1),
                         new ASTVar("x")
                     )),
                     new ASTTuple(List.of(
@@ -245,15 +245,15 @@ public class PatternMatchTest {
                 )),
                 new ASTTuple(List.of(
                     new ASTTuple(List.of(
-                        new ASTLiteralInt(1),
-                        new ASTLiteralInt(3)
+                        new ASTLiteralInteger(1),
+                        new ASTLiteralInteger(3)
                     )),
                     new ASTTuple(List.of(
-                        new ASTLiteralInt(3),
+                        new ASTLiteralInteger(3),
                         new ASTLiteralBool(false)
                     ))
                 )),
-                new ASTLiteralInt(0)
+                new ASTLiteralInteger(0)
             );
 
         // ACT + ASSERT
@@ -279,8 +279,8 @@ public class PatternMatchTest {
                     )
                 ),
                 new ASTTuple(List.of(
-                    new ASTLiteralInt(2),
-                    new ASTLiteralInt(3)
+                    new ASTLiteralInteger(2),
+                    new ASTLiteralInteger(3)
                 ))
             );
 
@@ -288,8 +288,8 @@ public class PatternMatchTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(-1);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(-1);
     }
 
 

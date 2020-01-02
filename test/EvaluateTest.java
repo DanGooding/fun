@@ -9,16 +9,16 @@ public class EvaluateTest {
         // ARRANGE
         ASTNode ast =
             new ASTPlus(
-                new ASTLiteralInt(2),
-                new ASTLiteralInt(3)
+                new ASTLiteralInteger(2),
+                new ASTLiteralInteger(3)
             );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(5);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(5);
     }
 
     @Test
@@ -26,16 +26,16 @@ public class EvaluateTest {
         // ARRANGE
         ASTNode ast =
             new ASTMinus(
-                new ASTLiteralInt(5),
-                new ASTLiteralInt(7)
+                new ASTLiteralInteger(5),
+                new ASTLiteralInteger(7)
             );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(-2);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(-2);
     }
 
     @Test
@@ -43,16 +43,16 @@ public class EvaluateTest {
         // ARRANGE
         ASTNode ast =
             new ASTMult(
-                new ASTLiteralInt(3),
-                new ASTLiteralInt(13)
+                new ASTLiteralInteger(3),
+                new ASTLiteralInteger(13)
             );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(39);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(39);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class EvaluateTest {
         ASTNode ast =
             new ASTLet(
                 "x",
-                new ASTLiteralInt(2),
+                new ASTLiteralInteger(2),
                 new ASTLet(
                     "y",
                     new ASTMult(
@@ -91,8 +91,8 @@ public class EvaluateTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(14);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(14);
     }
 
     @Test
@@ -103,12 +103,12 @@ public class EvaluateTest {
         ASTNode ast =
             new ASTLet(
                 "x",
-                new ASTLiteralInt(1),
+                new ASTLiteralInteger(1),
                 new ASTPlus(
                     new ASTLet(
                         "x",
-                        new ASTLiteralInt(2),
-                        new ASTLiteralInt(0)
+                        new ASTLiteralInteger(2),
+                        new ASTLiteralInteger(0)
                     ),
                     new ASTVar("x")
                 )
@@ -118,8 +118,8 @@ public class EvaluateTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(1);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(1);
     }
 
     @Test
@@ -147,11 +147,11 @@ public class EvaluateTest {
                     "addOne",
                     new ASTApply(
                         new ASTVar("add"),
-                        new ASTLiteralInt(1)
+                        new ASTLiteralInteger(1)
                     ),
                     new ASTApply(
                         new ASTVar("addOne"),
-                        new ASTLiteralInt(2)
+                        new ASTLiteralInteger(2)
                     )
                 )
             );
@@ -160,8 +160,8 @@ public class EvaluateTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(3);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(3);
     }
 
     @Test
@@ -176,7 +176,7 @@ public class EvaluateTest {
         ASTNode ast =
             new ASTLet(
                 "x",
-                new ASTLiteralInt(1),
+                new ASTLiteralInteger(1),
                 new ASTLet(
                     "f",
                     new ASTLambda(
@@ -188,10 +188,10 @@ public class EvaluateTest {
                     ),
                     new ASTLet(
                         "x",
-                        new ASTLiteralInt(2),
+                        new ASTLiteralInteger(2),
                         new ASTApply(
                             new ASTVar("f"),
-                            new ASTLiteralInt(0)
+                            new ASTLiteralInteger(0)
                         )
                     )
                 )
@@ -201,8 +201,8 @@ public class EvaluateTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(1);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(1);
 
     }
 

@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -379,10 +380,10 @@ public class Parser {
     }
 
 
-    private ASTLiteralInt parseInt() {
+    private ASTLiteralInteger parseInt() {
         Token t = currentToken;
         eat(TokenType.INTEGER);
-        return new ASTLiteralInt(Integer.parseInt(t.string));
+        return new ASTLiteralInteger(new BigInteger(t.string));
     }
 
     private ASTVar parseName() {

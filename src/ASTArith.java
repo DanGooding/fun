@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 
 abstract class ASTArith extends ASTNode {
 
@@ -9,19 +10,19 @@ abstract class ASTArith extends ASTNode {
         this.right = right;
     }
 
-    abstract int operator(int leftOperand, int rightOperand);
+    abstract BigInteger operator(BigInteger leftOperand, BigInteger rightOperand);
 
     abstract String operatorSymbol();
 
     @Override
-    IntValue evaluate(Environment env) throws EvaluationException {
+    IntegerValue evaluate(Environment env) throws EvaluationException {
         Value leftValue = left.evaluate(env);
         Value rightValue = right.evaluate(env);
 
-        if (leftValue instanceof IntValue && rightValue instanceof IntValue){
-            int leftOperand = ((IntValue) leftValue).getValue();
-            int rightOperand = ((IntValue) rightValue).getValue();
-            return new IntValue(operator(leftOperand, rightOperand));
+        if (leftValue instanceof IntegerValue && rightValue instanceof IntegerValue){
+            BigInteger leftOperand = ((IntegerValue) leftValue).getValue();
+            BigInteger rightOperand = ((IntegerValue) rightValue).getValue();
+            return new IntegerValue(operator(leftOperand, rightOperand));
         }else {
             throw new TypeErrorException("can only perform arithmetic on constant int value");
         }

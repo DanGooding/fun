@@ -10,16 +10,16 @@ public class IfTest {
         // ARRANGE
         ASTNode ast = new ASTIf(
             new ASTLiteralBool(true),
-            new ASTLiteralInt(1),
-            new ASTLiteralInt(0)
+            new ASTLiteralInteger(1),
+            new ASTLiteralInteger(0)
         );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(1);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(1);
     }
 
     @Test
@@ -27,16 +27,16 @@ public class IfTest {
         // ARRANGE
         ASTNode ast = new ASTIf(
             new ASTLiteralBool(false),
-            new ASTLiteralInt(1),
-            new ASTLiteralInt(0)
+            new ASTLiteralInteger(1),
+            new ASTLiteralInteger(0)
         );
 
         // ACT
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(0);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(0);
     }
 
     @Test
@@ -45,10 +45,10 @@ public class IfTest {
         ASTNode ast =
             new ASTIf(
                 new ASTLiteralBool(true),
-                new ASTLiteralInt(1),
-                new ASTLiteralInt(0) {
+                new ASTLiteralInteger(1),
+                new ASTLiteralInteger(0) {
                     @Override
-                    IntValue evaluate(Environment env) {
+                    IntegerValue evaluate(Environment env) {
                         TestCase.fail();  // this should not be evaluated, fail the test if it is
                         return super.evaluate(env);
                     }
@@ -65,14 +65,14 @@ public class IfTest {
         ASTNode ast =
             new ASTIf(
                 new ASTLiteralBool(false),
-                new ASTLiteralInt(1) {
+                new ASTLiteralInteger(1) {
                     @Override
-                    IntValue evaluate(Environment env) {
+                    IntegerValue evaluate(Environment env) {
                         TestCase.fail();  // this should not be evaluated, fail the test if it is
                         return super.evaluate(env);
                     }
                 },
-                new ASTLiteralInt(0)
+                new ASTLiteralInteger(0)
             );
 
         // ACT

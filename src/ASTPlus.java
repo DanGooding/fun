@@ -1,3 +1,5 @@
+import java.math.BigInteger;
+
 class ASTPlus extends ASTArith {
 
     ASTPlus(ASTNode left, ASTNode right) {
@@ -5,8 +7,8 @@ class ASTPlus extends ASTArith {
     }
 
     @Override
-    int operator(int leftOperand, int rightOperand) {
-        return leftOperand + rightOperand;
+    BigInteger operator(BigInteger leftOperand, BigInteger rightOperand) {
+        return leftOperand.add(rightOperand);
     }
 
     @Override

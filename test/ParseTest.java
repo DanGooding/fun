@@ -15,8 +15,8 @@ public class ParseTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(-13);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(-13);
     }
 
     @Test
@@ -30,8 +30,8 @@ public class ParseTest {
         Value result = ast.evaluate();
 
         // ASSERT
-        assertThat(result).isInstanceOf(IntValue.class);
-        assertThat(((IntValue) result).getValue()).isEqualTo(262144);
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(262144);
     }
 
     @Test

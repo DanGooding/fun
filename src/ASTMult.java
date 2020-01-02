@@ -1,3 +1,5 @@
+import java.math.BigInteger;
+
 class ASTMult extends ASTArith {
 
     ASTMult(ASTNode left, ASTNode right) {
@@ -5,8 +7,8 @@ class ASTMult extends ASTArith {
     }
 
     @Override
-    int operator(int leftOperand, int rightOperand) {
-        return leftOperand * rightOperand;
+    BigInteger operator(BigInteger leftOperand, BigInteger rightOperand) {
+        return leftOperand.multiply(rightOperand);
     }
 
     @Override
