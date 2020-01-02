@@ -22,7 +22,7 @@ public class Parser {
     private Token currentToken;
 
     Parser(String input) {
-        tokenStream = new TokenStream(input);
+        tokenStream = new BlockMaker(new Tokenizer(input));
         advance();
     }
 
@@ -48,6 +48,27 @@ public class Parser {
             throw new RuntimeException(String.format("parse error, %s expected", type));
         }
     }
+
+    // TODO: use these on newlines
+
+    /**
+     * if currentToken is of given type, advance, otherwise do nothing
+     */
+    private void ignore(TokenType type) {
+        if (currentToken.type == type) {
+            advance();
+        }
+    }
+
+    /**
+     * ignore 0 or more tokens of given type
+     */
+    private void ignoreMany(TokenType type) {
+        while (currentToken.type == type) {
+            advance();
+        }
+    }
+
 
     // TODO: top level: multiple expressions - this requires changes to the AST too
 
@@ -82,6 +103,30 @@ public class Parser {
                 eat(TokenType.ARROW);
                 ASTNode body = parseExpr();
                 return new ASTLambda(param, body);
+            }
+
+            case CASE: {
+                eat(TokenType.CASE);
+                ASTNode subject = parseExpr();
+                eat(TokenType.OF);
+
+                eat(TokenType.BLOCK_BEGIN);
+
+                List<ASTCaseOption> options = new ArrayList<>();
+                while (currentToken.type != TokenType.BLOCK_END) {  // TODO: a parseBlock function
+                    if (options.size() > 0) {
+                        eat(TokenType.BLOCK_DELIM);
+                    }
+
+                    ASTMatchable pattern = parsePattern();
+                    eat(TokenType.ARROW);
+                    ASTNode body = parseExpr();
+
+                    options.add(new ASTCaseOption(pattern, body));
+                }
+                eat(TokenType.BLOCK_END);
+
+                return new ASTCase(subject, options);
             }
 
             default: {
@@ -158,13 +203,13 @@ public class Parser {
                     prevOp, prevInfo,
                     currentOp, currentInfo));
 
-            }else if (prevInfo.associativity == Assoc.NONE) { // both NONE
+            } else if (prevInfo.associativity == Assoc.NONE) { // both NONE
                 throw new RuntimeException(String.format(
                     "cannot mix non-associative %s and %s",
                     prevOp,
                     currentOp));
 
-            }else if (prevInfo.associativity == Assoc.LEFT) { // both LEFT
+            } else if (prevInfo.associativity == Assoc.LEFT) { // both LEFT
                 return true;
             }
         }

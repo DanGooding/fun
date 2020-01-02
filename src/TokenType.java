@@ -13,7 +13,12 @@ public enum TokenType {
 
     LAMBDA,
 
-    // CASE, OF
+    CASE,
+    OF,
+
+    BLOCK_BEGIN,
+    BLOCK_DELIM,
+    BLOCK_END,
 
     // literals
 //    TRUE,
