@@ -29,51 +29,51 @@ public class TokenStream {
      */
     Token nextToken() {
         if (inputStream.atEOF()) {
-            return new Token(TokenType.EOF);
+            return new Token(TokenType.EOF, inputStream.getPosition());
         }
 
         readWhile(this::isWhitespace);
 
         char c = inputStream.peekChar();
+
+        FilePosition position = inputStream.getPosition();
+
         if (isDigitChar(c)) {
             return readInteger();
 
-        }else if (isNameStartChar(c)) {
+        } else if (isNameStartChar(c)) {
             return readName();
 
-        }else if (isOperatorChar(c)) {
+        } else if (isOperatorChar(c)) {
             return readOperator();
 
-        }else if (c == '(') {
-            inputStream.nextChar(); // advance
-            return new Token(TokenType.OPEN_BRACKET);
+        } else if (isNewlineStartChar(c)) {
+            return readNewline();
 
-        }else if (c == ')') {
-            inputStream.nextChar();
-            return new Token(TokenType.CLOSE_BRACKET);
+        } else if (c == '(') {
+            inputStream.advance();
+            return new Token(TokenType.OPEN_BRACKET, position);
 
-        }else if (c == ',') {
-            inputStream.nextChar();
-            return new Token(TokenType.COMMA);
+        } else if (c == ')') {
+            inputStream.advance();
+            return new Token(TokenType.CLOSE_BRACKET, position);
 
-        }else if (c == '_') { // TODO: combine this with readName ?
-            inputStream.nextChar();
-            return new Token(TokenType.UNDERSCORE);
+        } else if (c == ',') {
+            inputStream.advance();
+            return new Token(TokenType.COMMA, position);
 
-        }else if (c == '\n') { // TODO: allow windows CRLF \r\n (just discard \r ?)
-            inputStream.nextChar();
-            return new Token(TokenType.NEWLINE);
-
-        } else {
-            // TODO: proper exception class here
-            throw new RuntimeException("unknown token");
+        } else if (c == '_') { // TODO: combine this with readName ?
+            inputStream.advance();
+            return new Token(TokenType.UNDERSCORE, position);
         }
-        // TODO: allow comments
+        // TODO: proper exception class here
+        throw new RuntimeException(String.format("unknown token %s", position));
 
+        // TODO: allow comments
     }
 
 
-    boolean isWhitespace(char c) {
+    private boolean isWhitespace(char c) {
         return c == ' ';
     }
 
@@ -83,7 +83,8 @@ public class TokenStream {
     }
 
     private Token readInteger() {
-        return new Token(TokenType.INTEGER, readWhile(this::isDigitChar));
+        FilePosition position = inputStream.getPosition();
+        return new Token(TokenType.INTEGER, readWhile(this::isDigitChar), position);
     }
 
 
@@ -97,21 +98,14 @@ public class TokenStream {
     }
 
     private Token readName() {
-        // just use readWhile ?
-        String name = readAtLeastOneWhile(this::isNameChar);
+        FilePosition position = inputStream.getPosition();
+        String name = readWhile(this::isNameChar);
 
         if (keywords.containsKey(name)) {
-            return new Token(keywords.get(name));
+            return new Token(keywords.get(name), position);
         }
 
-        // hacked in boolean literals - no need
-//        if (name.equals("True")) {
-//            return new Token(TokenType.TRUE, name);
-//        }else if (name.equals("False")) {
-//            return new Token(TokenType.FALSE, name);
-//        }
-
-        return new Token(TokenType.NAME, name);
+        return new Token(TokenType.NAME, name, position);
     }
 
 
@@ -120,32 +114,48 @@ public class TokenStream {
     }
 
     private Token readOperator() {
+        FilePosition position = inputStream.getPosition();
+
         String s = readWhile(this::isOperatorChar);
         if (s.equals("->")) {
-            return new Token(TokenType.ARROW);
-        }else if (s.equals("=")) {
-            return new Token(TokenType.ASSIGN_EQUALS);
+            return new Token(TokenType.ARROW, position);
+        } else if (s.equals("=")) {
+            return new Token(TokenType.ASSIGN_EQUALS, position);
         }
         // allow user defined operators
         // check this is one once their declarations
         // have been parsed
-        return new Token(TokenType.OPERATOR, s);
+        return new Token(TokenType.OPERATOR, s, position);
     }
 
+    private boolean isNewlineStartChar(char c) {
+        return c == '\n' || c == '\r';
+    }
+
+    private Token readNewline() {
+        char c = inputStream.peekChar();
+
+        FilePosition position = inputStream.getPosition();
+
+        if (c == '\n') {
+            inputStream.advance();
+            return new Token(TokenType.NEWLINE, position);
+        }else if (c == '\r') {
+            inputStream.advance();
+            if (inputStream.peekChar() == '\n') {
+                inputStream.advance();
+                return new Token(TokenType.NEWLINE, position);
+            }
+        }
+        throw new RuntimeException(String.format("bad newline %s", position));
+    }
 
     private String readWhile(Function<Character, Boolean> predicate) {
         StringBuilder stringBuilder = new StringBuilder();
         while (!inputStream.atEOF() && predicate.apply(inputStream.peekChar())) {
-            stringBuilder.append(inputStream.nextChar());
+            stringBuilder.append(inputStream.popChar());
         }
         return stringBuilder.toString();
-    }
-
-    private String readAtLeastOneWhile(Function<Character, Boolean> predicate) {
-        char first = inputStream.nextChar();
-        String others = readWhile(predicate);
-//        return String.format("%c%s", first, others);
-        return first + others;
     }
 
 }
