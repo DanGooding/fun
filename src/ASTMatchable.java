@@ -12,4 +12,5 @@ public abstract class ASTMatchable extends ASTNode {
     // TODO: track new variables bound this match, detect any name bound more than once -> exception
     //  (not a pattern match exception!! --- this is a syntax error (invalid pattern))
 
+    // TODO: allow binding names to sub patterns (@ in Haskell, `as` in OCaml)
 }

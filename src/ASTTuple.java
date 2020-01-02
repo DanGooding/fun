@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO: have tuple generic, holding ASTNode, ASTMatchable or Value
+//  and implement the respective one of those  (is `Tuple<A> implements A` possible ? subtypes?)
 public class ASTTuple extends ASTMatchable {
 
     private final List<ASTNode> elements;
