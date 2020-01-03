@@ -6,12 +6,8 @@ class ASTVar extends ASTMatchable {
     }
 
     @Override
-    Value evaluate(Environment env) throws EvaluationException {
-        if (env.hasName(name)) {
-            return env.lookup(name);
-        }
-        // TODO: specialise NameError or something?
-        throw new EvaluationException(String.format("unbound variable '%s'", name));
+    Value evaluate(Environment env) throws EvaluationException { // TODO: specialise to name error or something
+        return env.lookup(name);
     }
 
     @Override

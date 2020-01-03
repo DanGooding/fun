@@ -22,7 +22,7 @@ public class ASTCase extends ASTNode {
         for (ASTCaseOption option : options) {
 
             try {
-                Environment innerEnv = new Environment(env);
+                Environment innerEnv = new Environment(env); // (cannot reuse)
 
                 option.pattern.bindMatch(subjectValue, innerEnv);
 

@@ -3,18 +3,22 @@ import java.util.Map;
 
 class Environment {
 
-    private Map<String, Value> bindings;
+    private final Map<String, Value> bindings;
 
-    Environment() {
-        bindings = new HashMap<>();
+    // the enclosing environment
+    private final Environment outer;
+
+    Environment(Map<String, Value> bindings, Environment outer) {
+        this.bindings = new HashMap<>(bindings); // must create a mutable copy !
+        this.outer = outer;
     }
 
-    /**
-     * shallow copy constructor
-     */
-    Environment(Environment env) {
-        // assumes `Value`s are immutable, doesn't deepcopy
-        this.bindings = new HashMap<>(env.bindings);
+    Environment(Environment outer) {
+        this(Map.of(), outer);
+    }
+
+    Environment() {
+        this(Map.of(), null);
     }
 
     /**
@@ -24,22 +28,19 @@ class Environment {
         bindings.put(name, value);
     }
 
-    /**
-     * return a copy of this environment,
-     * adding the binding (value, name) to it
-     */
-    Environment withBinding(String name, Value value) {
-        Environment newEnv = new Environment(this);
-        newEnv.bind(name, value);
-        return newEnv;
-    }
-
-    Value lookup(String name) {
-         return bindings.get(name);
+    Value lookup(String name) throws EvaluationException {
+         if (bindings.containsKey(name)) {
+             return bindings.get(name);
+         }
+         if (outer == null) {
+             throw new EvaluationException(String.format("unbound variable '%s'", name));
+         }
+         return outer.lookup(name);
     }
 
     boolean hasName(String name) {
-        return bindings.containsKey(name);
+        // exploits short circuiting of || and &&
+        return bindings.containsKey(name) || (outer != null && outer.hasName(name));
     }
 
 }
