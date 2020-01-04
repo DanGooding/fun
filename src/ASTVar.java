@@ -1,4 +1,4 @@
-class ASTVar extends ASTMatchable {
+class ASTVar extends ASTNode implements ASTMatchable {
     private final String name;
 
     ASTVar(String name) {
@@ -11,7 +11,7 @@ class ASTVar extends ASTMatchable {
     }
 
     @Override
-    void bindMatch(Value subject, Environment env) {
+    public void bindMatch(Value subject, Environment env) {
         env.bind(name, subject);
     }
 

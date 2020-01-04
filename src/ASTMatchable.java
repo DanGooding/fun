@@ -1,5 +1,5 @@
 
-public abstract class ASTMatchable extends ASTNode {
+public interface ASTMatchable {
     // anything that can represents a pattern that values can be matched against
 
     // TODO: a failed match is not exceptional -> is throwing an exception a bad way of communicating this ?
@@ -10,7 +10,7 @@ public abstract class ASTMatchable extends ASTNode {
      * @param env the environment to bind any variable names into
      * @throws PatternMatchFailedException if the value doesn't match the pattern
      */
-    abstract void bindMatch(Value subject, Environment env) throws PatternMatchFailedException;
+    void bindMatch(Value subject, Environment env) throws PatternMatchFailedException;
     // TODO: track new variables bound this match, detect any name bound more than once -> exception
     //  (not a pattern match exception!! --- this is a syntax error (invalid pattern))
 

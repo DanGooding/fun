@@ -1,5 +1,6 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -49,27 +50,6 @@ public class Parser {
             throw new RuntimeException(String.format("parse error, %s expected", type));
         }
     }
-
-    // TODO: use these on newlines
-
-    /**
-     * if currentToken is of given type, advance, otherwise do nothing
-     */
-    private void ignore(TokenType type) {
-        if (currentToken.type == type) {
-            advance();
-        }
-    }
-
-    /**
-     * ignore 0 or more tokens of given type
-     */
-    private void ignoreMany(TokenType type) {
-        while (currentToken.type == type) {
-            advance();
-        }
-    }
-
 
     // TODO: top level: multiple expressions - this requires changes to the AST too
 
@@ -369,13 +349,7 @@ public class Parser {
             return patterns.get(0);
 
         } else { // a tuple
-            // TODO: separate tuplePattern and tupleConstructor types would make this cleaner
-            // List<B> is not a subtype of List<A>, even when B is a subtype of A
-            // so cannot just: return new ASTTuple(elements);
-
-            List<ASTNode> elements = new ArrayList<>(patterns.size());
-            elements.addAll(patterns);
-            return new ASTTuple(elements);
+            return new ASTTuplePattern(patterns);
         }
     }
 
