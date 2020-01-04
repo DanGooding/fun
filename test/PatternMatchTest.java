@@ -13,7 +13,7 @@ public class PatternMatchTest {
         // let (1, False, 3, True) = (1, False, 3, True) in 0
         ASTNode ast =
             new ASTLet(
-                new ASTTuple(List.of(
+                new ASTTuplePattern(List.of(
                     new ASTLiteralInteger(1),
                     new ASTLiteralBool(false),
                     new ASTLiteralInteger(3),
@@ -43,7 +43,7 @@ public class PatternMatchTest {
         // let (1, 2) = (1, 3) in 0
         ASTNode ast =
             new ASTLet(
-                new ASTTuple(List.of(
+                new ASTTuplePattern(List.of(
                     new ASTLiteralInteger(1),
                     new ASTLiteralInteger(2)
                 )),
@@ -64,7 +64,7 @@ public class PatternMatchTest {
         // let (1, 2, 3) = (1, 2) in 0
         ASTNode ast =
             new ASTLet(
-                new ASTTuple(List.of(
+                new ASTTuplePattern(List.of(
                     new ASTLiteralInteger(1),
                     new ASTLiteralInteger(2),
                     new ASTLiteralInteger(3)
@@ -86,7 +86,7 @@ public class PatternMatchTest {
         // let (1, 2) = (1, 2, 3) in 0
         ASTNode ast =
             new ASTLet(
-                new ASTTuple(List.of(
+                new ASTTuplePattern(List.of(
                     new ASTLiteralInteger(1),
                     new ASTLiteralInteger(2)
                 )),
@@ -107,8 +107,8 @@ public class PatternMatchTest {
         // ARRANGE
         ASTNode ast =
             new ASTLet(
-                ASTTuple.unit(),
-                ASTTuple.unit(),
+                new ASTTuplePattern(List.of()),
+                new ASTTuple(List.of()),
                 new ASTLiteralInteger(0)
             );
 
@@ -127,17 +127,17 @@ public class PatternMatchTest {
         // let (1, (2, (3, 4), 5), (6, 7)) = (1, (2, (3, 4), 5), (6, 7)) in 0
         ASTNode ast =
             new ASTLet(
-                new ASTTuple(List.of(
+                new ASTTuplePattern(List.of(
                     new ASTLiteralInteger(1),
-                    new ASTTuple(List.of(
+                    new ASTTuplePattern(List.of(
                         new ASTLiteralInteger(2),
-                        new ASTTuple(List.of(
+                        new ASTTuplePattern(List.of(
                             new ASTLiteralInteger(3),
                             new ASTLiteralInteger(4)
                         )),
                         new ASTLiteralInteger(5)
                     )),
-                    new ASTTuple(List.of(
+                    new ASTTuplePattern(List.of(
                         new ASTLiteralInteger(6),
                         new ASTLiteralInteger(7)
                     ))
@@ -177,7 +177,7 @@ public class PatternMatchTest {
         // let (x, y) = (10, 2) in x - y
         ASTNode ast =
             new ASTLet(
-                new ASTTuple(List.of(
+                new ASTTuplePattern(List.of(
                     new ASTVar("x"),
                     new ASTVar("y")
                 )),
@@ -200,31 +200,6 @@ public class PatternMatchTest {
 
     }
 
-    // TODO: give this a dedicated exception type + ensure it is caught at parse time
-    @Test(expected = UnsupportedOperationException.class)
-    public void fails_forNonMatchableTupleElement() throws EvaluationException {
-        // ARRANGE
-        // let (1, x + 2) = (1, 4) in 0
-        ASTNode ast =
-            new ASTLet(
-                new ASTTuple(List.of(
-                    new ASTLiteralInteger(1),
-                    new ASTPlus(
-                        new ASTVar("x"),
-                        new ASTLiteralInteger(2)
-                    )
-                )),
-                new ASTTuple(List.of(
-                    new ASTLiteralInteger(1),
-                    new ASTLiteralInteger(4)
-                )),
-                new ASTLiteralInteger(0)
-            );
-
-        // ACT
-        ast.evaluate();
-    }
-
     @Test(expected = EvaluationException.class) // TODO: make a dedicated exception subtype
     public void throwsSuitable_OnMultipleAssignmentsToSameVariable() throws EvaluationException {
         // ARRANGE
@@ -233,12 +208,12 @@ public class PatternMatchTest {
 
         ASTNode ast =
             new ASTLet(
-                new ASTTuple(List.of(
-                    new ASTTuple(List.of(
+                new ASTTuplePattern(List.of(
+                    new ASTTuplePattern(List.of(
                         new ASTLiteralInteger(1),
                         new ASTVar("x")
                     )),
-                    new ASTTuple(List.of(
+                    new ASTTuplePattern(List.of(
                         new ASTVar("x"),
                         new ASTLiteralBool(false)
                     ))
@@ -269,7 +244,7 @@ public class PatternMatchTest {
         ASTNode ast =
             new ASTApply(
                 new ASTLambda(
-                    new ASTTuple(List.of(
+                    new ASTTuplePattern(List.of(
                         new ASTVar("a"),
                         new ASTVar("b")
                     )),

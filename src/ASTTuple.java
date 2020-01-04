@@ -2,9 +2,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO: have tuple generic, holding ASTNode, ASTMatchable or Value
-//  and implement the respective one of those  (is `Tuple<A> implements A` possible ? subtypes?)
-public class ASTTuple extends ASTMatchable {
+// TODO: tuple base class - extended by this, TuplePattern & TupleValue
+public class ASTTuple extends ASTNode {
 
     private final List<ASTNode> elements;
 
@@ -15,10 +14,6 @@ public class ASTTuple extends ASTMatchable {
 //        }
 
         this.elements = List.copyOf(elements);
-    }
-
-    public static ASTTuple unit() {
-        return new ASTTuple(List.of());
     }
 
     public int size() {
@@ -33,26 +28,6 @@ public class ASTTuple extends ASTMatchable {
             elementValues.add(e.evaluate(env));
         }
         return new TupleValue(elementValues);
-    }
-
-    @Override
-    void bindMatch(Value subject, Environment env) throws PatternMatchFailedException {
-        if (!(subject instanceof TupleValue)) {
-            throw new PatternMatchFailedException("tuple expected, got " + subject);
-        }
-        TupleValue tupleSubject = (TupleValue) subject;
-        if (tupleSubject.size() != this.size()) {
-            throw new PatternMatchFailedException(String.format(
-                "%d-tuple expected, got %d-tuple", this.size(), ((TupleValue) subject).size()));
-        }
-        for (int i = 0; i < size(); i++) {
-            ASTNode element = elements.get(i);
-            if (!(element instanceof ASTMatchable)) {
-                // TODO: this is an error the user's code is wrong - is this caught at parse time?
-                throw new UnsupportedOperationException("cannot match against " + subject);
-            }
-            ((ASTMatchable) element).bindMatch(tupleSubject.getElement(i), env);
-        }
     }
 
     @Override

@@ -1,6 +1,6 @@
 import java.math.BigInteger;
 
-class ASTLiteralInteger extends ASTMatchable {
+class ASTLiteralInteger extends ASTNode implements ASTMatchable {
     private final BigInteger value;
 
     ASTLiteralInteger(BigInteger value) {
@@ -16,7 +16,7 @@ class ASTLiteralInteger extends ASTMatchable {
     }
 
     @Override
-    void bindMatch(Value subject, Environment env) throws PatternMatchFailedException {
+    public void bindMatch(Value subject, Environment env) throws PatternMatchFailedException {
         if (!(subject instanceof IntegerValue) ||
             !this.value.equals(((IntegerValue) subject).getValue())) {
             // not an IntegerValue, or has a different value to this:

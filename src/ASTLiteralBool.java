@@ -1,4 +1,4 @@
-public class ASTLiteralBool extends ASTMatchable {
+public class ASTLiteralBool extends ASTNode implements ASTMatchable {
     private final boolean value;
 
     public ASTLiteralBool(boolean value) {
@@ -11,7 +11,7 @@ public class ASTLiteralBool extends ASTMatchable {
     }
 
     @Override
-    void bindMatch(Value subject, Environment env) throws PatternMatchFailedException {
+    public void bindMatch(Value subject, Environment env) throws PatternMatchFailedException {
         if (!(subject instanceof BoolValue) ||
             ((BoolValue) subject).getValue() != this.value) {
             throw new PatternMatchFailedException(this.toString());
