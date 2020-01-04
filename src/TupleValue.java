@@ -3,24 +3,31 @@ import java.util.stream.Collectors;
 
 public class TupleValue implements ConstantValue {
 
-    private final List<Value> elements;
+    private final List<Thunk> elements;
 
-    TupleValue(List<Value> elements) {
+    TupleValue(List<Thunk> elements) {
         this.elements = List.copyOf(elements);
     }
 
-    public int size() {
+    int size() {
         return elements.size();
     }
 
-    public Value getElement(int i) {
+    Thunk getElement(int i) {
         return elements.get(i);
+    }
+
+    @Override
+    public void fullyForce() throws EvaluationException {
+        for (Thunk t : elements) {
+            t.force().fullyForce();
+        }
     }
 
     @Override
     public String toString() {
         return elements.stream()
-            .map(Value::toString)
+            .map(Thunk::toString)
             .collect(Collectors.joining(", ", "(", ")"));
     }
 }

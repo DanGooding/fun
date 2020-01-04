@@ -17,14 +17,14 @@ public class ASTCase extends ASTNode {
 
     @Override
     Value evaluate(Environment env) throws EvaluationException {
-        Value subjectValue = subject.evaluate(env);
+        Thunk subjectThunk = new Thunk(subject, env);
 
         for (ASTCaseOption option : options) {
 
             try {
                 Environment innerEnv = new Environment(env); // (cannot reuse)
 
-                option.pattern.bindMatch(subjectValue, innerEnv);
+                option.pattern.bindMatch(subjectThunk, innerEnv);
 
                 return option.body.evaluate(innerEnv);
 

@@ -10,7 +10,7 @@ public class ASTApply extends ASTNode {
 
     @Override
     Value evaluate(Environment env) throws EvaluationException {
-        Value argumentValue = argument.evaluate(env);
+        Thunk argumentThunk = new Thunk(argument, env);
         Value possibleFunctionValue = function.evaluate(env);
 
         if (possibleFunctionValue instanceof FunctionValue) {
@@ -20,7 +20,7 @@ public class ASTApply extends ASTNode {
             Environment internalEnv = new Environment(funObj.getCapturedEnv());
 
             try {
-                funObj.getParameterPattern().bindMatch(argumentValue, internalEnv);
+                funObj.getParameterPattern().bindMatch(argumentThunk, internalEnv);
             } catch (PatternMatchFailedException e) {
                 // TODO: more useful error message / specialised exception
                 throw new EvaluationException("pattern match failed in function");

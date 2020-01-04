@@ -11,9 +11,10 @@ public class ASTLiteralBool extends ASTNode implements ASTMatchable {
     }
 
     @Override
-    public void bindMatch(Value subject, Environment env) throws PatternMatchFailedException {
-        if (!(subject instanceof BoolValue) ||
-            ((BoolValue) subject).getValue() != this.value) {
+    public void bindMatch(Thunk subject, Environment env) throws PatternMatchFailedException, EvaluationException {
+        Value subjectValue = subject.force();
+        if (!(subjectValue instanceof BoolValue) ||
+            ((BoolValue) subjectValue).getValue() != this.value) {
             throw new PatternMatchFailedException(this.toString());
         }
     }

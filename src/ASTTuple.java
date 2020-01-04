@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,12 +21,8 @@ public class ASTTuple extends ASTNode {
 
     @Override
     Value evaluate(Environment env) throws EvaluationException {
-//        List<Value> elementValues = elements.stream().map(e -> e.evaluate(env)).collect(Collectors.toList());
-        List<Value> elementValues = new ArrayList<>(elements.size());
-        for (ASTNode e : elements) {
-            elementValues.add(e.evaluate(env));
-        }
-        return new TupleValue(elementValues);
+        List<Thunk> elementThunks = elements.stream().map(e -> new Thunk(e, env)).collect(Collectors.toList());
+        return new TupleValue(elementThunks);
     }
 
     @Override

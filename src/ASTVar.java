@@ -7,11 +7,11 @@ class ASTVar extends ASTNode implements ASTMatchable {
 
     @Override
     Value evaluate(Environment env) throws EvaluationException { // TODO: specialise to name error or something
-        return env.lookup(name);
+        return env.lookup(name).force();
     }
 
     @Override
-    public void bindMatch(Value subject, Environment env) {
+    public void bindMatch(Thunk subject, Environment env) {
         env.bind(name, subject);
     }
 

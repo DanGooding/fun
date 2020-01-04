@@ -14,14 +14,16 @@ public class ASTTuplePattern implements ASTMatchable {
     }
 
     @Override
-    public void bindMatch(Value subject, Environment env) throws PatternMatchFailedException {
-        if (!(subject instanceof TupleValue)) {
+    public void bindMatch(Thunk subject, Environment env) throws PatternMatchFailedException, EvaluationException {
+        Value subjectValue = subject.force();
+
+        if (!(subjectValue instanceof TupleValue)) {
             throw new PatternMatchFailedException("tuple expected, got " + subject);
         }
-        TupleValue tupleSubject = (TupleValue) subject;
+        TupleValue tupleSubject = (TupleValue) subjectValue;
         if (tupleSubject.size() != this.size()) {
             throw new PatternMatchFailedException(String.format(
-                "%d-tuple expected, got %d-tuple", this.size(), ((TupleValue) subject).size()));
+                "%d-tuple expected, got %d-tuple", this.size(), tupleSubject.size()));
         }
         for (int i = 0; i < size(); i++) {
             elements.get(i).bindMatch(tupleSubject.getElement(i), env);

@@ -3,7 +3,7 @@ public class ASTUnderscore implements ASTMatchable {
     ASTUnderscore() {}
 
     @Override
-    public void bindMatch(Value subject, Environment env) {
+    public void bindMatch(Thunk subject, Environment env) {
         // do nothing - match always succeeds, matched value discarded
         // if was lazy, wouldn't evaluate subject to a value
     }

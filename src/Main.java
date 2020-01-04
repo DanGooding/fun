@@ -17,6 +17,8 @@ public class Main {
 
             try {
                 Value result = expr.evaluate();
+                result.fullyForce();
+
                 System.out.println(result);
 
             } catch (EvaluationException e) {

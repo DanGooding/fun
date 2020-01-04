@@ -6,11 +6,11 @@ public interface ASTMatchable {
 
     /**
      * try to bind the value subject to this pattern
-     * @param subject the value to try and match to this pattern
+     * @param subject thunk of the value to bind to this pattern
      * @param env the environment to bind any variable names into
      * @throws PatternMatchFailedException if the value doesn't match the pattern
      */
-    void bindMatch(Value subject, Environment env) throws PatternMatchFailedException;
+    void bindMatch(Thunk subject, Environment env) throws PatternMatchFailedException, EvaluationException;
     // TODO: track new variables bound this match, detect any name bound more than once -> exception
     //  (not a pattern match exception!! --- this is a syntax error (invalid pattern))
 

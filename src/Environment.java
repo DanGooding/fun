@@ -1,14 +1,14 @@
 import java.util.HashMap;
 import java.util.Map;
 
-class Environment {
+class Environment {  // TODO: make immutable
 
-    private final Map<String, Value> bindings;
+    private final Map<String, Thunk> bindings;
 
     // the enclosing environment
     private final Environment outer;
 
-    Environment(Map<String, Value> bindings, Environment outer) {
+    Environment(Map<String, Thunk> bindings, Environment outer) {
         this.bindings = new HashMap<>(bindings); // must create a mutable copy !
         this.outer = outer;
     }
@@ -24,11 +24,11 @@ class Environment {
     /**
      * mutating update
      */
-    void bind(String name, Value value) {
-        bindings.put(name, value);
+    void bind(String name, Thunk thunk) {
+        bindings.put(name, thunk);
     }
 
-    Value lookup(String name) throws EvaluationException {
+    Thunk lookup(String name) throws EvaluationException {
          if (bindings.containsKey(name)) {
              return bindings.get(name);
          }

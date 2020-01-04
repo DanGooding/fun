@@ -6,4 +6,9 @@
 
 public interface Value {
 
+    default void fullyForce() throws EvaluationException {
+        // by default, values have nothing to force,
+        // composite values however do
+    }
+
 }
