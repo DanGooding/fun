@@ -1,3 +1,8 @@
+import fun.ast.*;
+import fun.eval.Environment;
+import fun.eval.EvaluationException;
+import fun.values.IntegerValue;
+import fun.values.Value;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -9,7 +14,7 @@ public class LazinessTest {
 
     static class FailOnEval extends ASTNode {
         @Override
-        Value evaluate(Environment env) {
+        public Value evaluate(Environment env) {
             TestCase.fail("shouldn't evaluate this");
             return null;
         }
@@ -26,7 +31,7 @@ public class LazinessTest {
         }
 
         @Override
-        Value evaluate(Environment env) throws EvaluationException {
+        public Value evaluate(Environment env) throws EvaluationException {
             evalCount += 1;
             return inner.evaluate(env);
         }

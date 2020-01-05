@@ -1,3 +1,11 @@
+import fun.ast.ASTIf;
+import fun.ast.ASTLiteralBool;
+import fun.ast.ASTLiteralInteger;
+import fun.ast.ASTNode;
+import fun.eval.Environment;
+import fun.eval.EvaluationException;
+import fun.values.IntegerValue;
+import fun.values.Value;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -48,7 +56,7 @@ public class IfTest {
                 new ASTLiteralInteger(1),
                 new ASTLiteralInteger(0) {
                     @Override
-                    IntegerValue evaluate(Environment env) {
+                    public IntegerValue evaluate(Environment env) {
                         TestCase.fail();  // this should not be evaluated, fail the test if it is
                         return super.evaluate(env);
                     }
@@ -67,7 +75,7 @@ public class IfTest {
                 new ASTLiteralBool(false),
                 new ASTLiteralInteger(1) {
                     @Override
-                    IntegerValue evaluate(Environment env) {
+                    public IntegerValue evaluate(Environment env) {
                         TestCase.fail();  // this should not be evaluated, fail the test if it is
                         return super.evaluate(env);
                     }

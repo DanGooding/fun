@@ -1,3 +1,8 @@
+import fun.ast.*;
+import fun.eval.EvaluationException;
+import fun.eval.TypeErrorException;
+import fun.values.BoolValue;
+import fun.values.Value;
 import org.junit.Test;
 
 import java.util.List;

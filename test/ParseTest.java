@@ -1,3 +1,9 @@
+import fun.ast.ASTNode;
+import fun.eval.EvaluationException;
+import fun.parser.Parser;
+import fun.values.BoolValue;
+import fun.values.IntegerValue;
+import fun.values.Value;
 import org.junit.Test;
 
 import static com.google.common.truth.Truth.assertThat;
