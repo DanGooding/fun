@@ -28,7 +28,7 @@ public class ASTTuple extends ASTNode {
     }
 
     @Override
-    public Value evaluate(Environment env) throws EvaluationException {
+    public Value evaluate(Environment env) {
         List<Thunk> elementThunks = elements.stream().map(e -> new Thunk(e, env)).collect(Collectors.toList());
         return new TupleValue(elementThunks);
     }

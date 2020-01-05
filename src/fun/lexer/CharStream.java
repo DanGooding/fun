@@ -1,6 +1,6 @@
 package fun.lexer;
 
-public class CharStream {
+class CharStream {
 
     private final String input;
 
@@ -49,7 +49,7 @@ public class CharStream {
         return index == input.length();
     }
 
-    public FilePosition getPosition() {
+    FilePosition getPosition() {
         return position;
     }
 }

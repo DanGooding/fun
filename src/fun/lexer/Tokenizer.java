@@ -26,7 +26,7 @@ public class Tokenizer implements TokenStream {
     private static final String operatorChars = "+-*^=>";
 
 
-    private CharStream inputStream;
+    private final CharStream inputStream;
 
     public Tokenizer(String input) {
         inputStream = new CharStream(input);

@@ -23,7 +23,7 @@ public class LazinessTest {
     static class EvalCounter extends ASTNode {
 
         private int evalCount;
-        private ASTNode inner;
+        private final ASTNode inner;
 
         EvalCounter(ASTNode inner) {
             this.inner = inner;

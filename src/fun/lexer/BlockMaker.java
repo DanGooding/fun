@@ -14,9 +14,9 @@ public class BlockMaker implements TokenStream {
     private static final List<TokenType> blockStartTokens =
         List.of(TokenType.OF);  // TODO: also LET if using haskell let blocks
 
-    private Tokenizer tokenStream;
-    private Deque<Token> nextTokens; // a queue
-    private List<Integer> indentationLevels; // a stack
+    private final Tokenizer tokenStream;
+    private final Deque<Token> nextTokens; // a queue
+    private final List<Integer> indentationLevels; // a stack
 
     public BlockMaker(Tokenizer tokenStream) {
         this.tokenStream = tokenStream;
