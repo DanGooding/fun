@@ -17,10 +17,13 @@ class ASTLet extends ASTNode {
 
     @Override
     Value evaluate(Environment env) throws EvaluationException {
+
+        // the environment the body will be evaluated in
+        // has all the bindings of `env`, plus everything bound in the pattern match
         Environment bodyEnv = new Environment(env);
 
         try {
-            pattern.bindMatch(new Thunk(assigned, env), bodyEnv); // TODO: pass bodyEnv to allow recursion (?)
+            pattern.bindMatch(new Thunk(assigned, bodyEnv), bodyEnv);
 
         } catch (PatternMatchFailedException e) {
             throw new EvaluationException(e.getMessage());
