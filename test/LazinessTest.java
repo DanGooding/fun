@@ -168,4 +168,10 @@ public class LazinessTest {
         assertThat(evalCounter_literal2.getEvalCount()).isEqualTo(1);
     }
 
+    // TODO:
+    //  let (x, y) = f 100 in 0
+    //  should f 100 be evaluated at all ?
+    //  with type checking - no
+    //  without, must evaluate to be sure its result is a 2-tuple
+
 }
