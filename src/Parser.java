@@ -1,6 +1,5 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -261,6 +260,8 @@ public class Parser {
     private boolean currentBeginsBaseExpr() {
         switch (currentToken.type) {
             case INTEGER:
+            case TRUE:
+            case FALSE:
             case NAME:
             case OPEN_BRACKET:
                 return true;
@@ -276,6 +277,10 @@ public class Parser {
         switch (currentToken.type) {
             case INTEGER:
                 return parseInt();
+
+            case TRUE:
+            case FALSE:
+                return parseBool();
 
             case NAME:
                 return parseName();
@@ -323,6 +328,10 @@ public class Parser {
             case INTEGER:
                 return parseInt();
 
+            case TRUE:
+            case FALSE:
+                return parseBool();
+
             case OPEN_BRACKET:
                 return parseBracketedPattern();
 
@@ -353,6 +362,16 @@ public class Parser {
         }
     }
 
+
+    private ASTLiteralBool parseBool() {
+        if (currentToken.type == TokenType.TRUE) {
+            eat(TokenType.TRUE);
+            return new ASTLiteralBool(true);
+        }else {
+            eat(TokenType.FALSE);
+            return new ASTLiteralBool(false);
+        }
+    }
 
     private ASTLiteralInteger parseInt() {
         Token t = currentToken;

@@ -15,7 +15,10 @@ public class Tokenizer implements TokenStream {
             "lambda", TokenType.LAMBDA,
 
             "case", TokenType.CASE,
-            "of", TokenType.OF
+            "of", TokenType.OF,
+
+            "True", TokenType.TRUE,
+            "False", TokenType.FALSE
         );
 
     private static final String operatorChars = "+-*^=>";

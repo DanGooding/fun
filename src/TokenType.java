@@ -21,8 +21,8 @@ public enum TokenType {
     BLOCK_END,
 
     // literals
-//    TRUE,
-//    FALSE,
+    TRUE,
+    FALSE,
 
     OPERATOR,
 
