@@ -81,7 +81,7 @@ public class Tokenizer implements TokenStream {
         // TODO: allow comments
     }
 
-
+    // TODO: allow tabs (constant width or tabstops?)
     private boolean isWhitespace(char c) {
         return c == ' ';
     }

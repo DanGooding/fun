@@ -13,14 +13,22 @@ public class Main {
 
     public static void main(String[] args) {
 
+        String filename;
+        if (args.length == 0) {
+            filename = "program.txt";
+        }else {
+            filename = args[0];
+        }
+
         try {
-            String content = Files.readString(Paths.get("program.txt"));
+            String content = Files.readString(Paths.get(filename));
 
             Parser p = new Parser(content);
 
             ASTNode expr = p.parseExpr();
 
             System.out.println(expr);
+            System.out.println();
 
             try {
                 Value result = expr.evaluate();

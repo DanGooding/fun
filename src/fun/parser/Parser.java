@@ -51,11 +51,19 @@ public class Parser {
             // the expected token is possibly not the most useful thing, eg:
             // let t = (1, 2 in t
             // gives 'expected COMMA', rather than close bracket
+            // TODO: include position in source -- show code?
             throw new RuntimeException(String.format("parse error, %s expected", type));
         }
     }
 
     // TODO: top level: multiple expressions - this requires changes to the AST too
+
+    // TODO: proper ParseErrorException ?
+
+    // TODO: throw if EOF not reached at end (eg some invalid stuff before EOF)
+
+    // TODO: parse methods that take parsers: ??
+    //      <T> T parseBracketed(Supplier<T> parseElement)
 
     // TODO: make private, all except a root parseProgram function
     public ASTNode parseExpr() {

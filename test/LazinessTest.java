@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 public class LazinessTest {
 
+    // TODO: these don't need ot be static do they?
     static class FailOnEval extends ASTNode {
         @Override
         public Value evaluate(Environment env) {
@@ -179,4 +180,8 @@ public class LazinessTest {
     //  with type checking - no
     //  without, must evaluate to be sure its result is a 2-tuple
 
+
+
+
+    // TODO: @Jailbreak to test private methods
 }

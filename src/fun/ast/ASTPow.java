@@ -8,6 +8,7 @@ public class ASTPow extends ASTArith {
         super(left, right);
     }
 
+    // TODO: rethrow exception as EvaluationException on negative power
     @Override
     BigInteger operator(BigInteger base, BigInteger power) {
         return base.pow(power.intValueExact());
