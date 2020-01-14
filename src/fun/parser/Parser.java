@@ -20,6 +20,7 @@ public class Parser {
             "+", new OpInfo(6, Assoc.LEFT),
             "-", new OpInfo(6, Assoc.LEFT),
 
+            "<", new OpInfo(4, Assoc.NONE),
             "==", new OpInfo(4, Assoc.NONE)
         );
 
@@ -234,6 +235,10 @@ public class Parser {
 
             case "^":
                 combined = new ASTPow(left, right);
+                break;
+
+            case "<":
+                combined = new ASTLessThan(left, right);
                 break;
 
             case "==":

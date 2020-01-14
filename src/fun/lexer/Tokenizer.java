@@ -23,7 +23,7 @@ public class Tokenizer implements TokenStream {
             "False", TokenType.FALSE
         );
 
-    private static final String operatorChars = "+-*^=>";
+    private static final String operatorChars = "+-*^=<>";
 
 
     private final CharStream inputStream;
