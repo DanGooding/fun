@@ -92,6 +92,7 @@ public class Tokenizer implements TokenStream {
     }
 
     private Token readInteger() {
+        // FIXME: integer must have space after if letter next: 123abc not a valid token pair !!
         FilePosition position = inputStream.getPosition();
         return new Token(TokenType.INTEGER, readWhile(this::isDigitChar), position);
     }
