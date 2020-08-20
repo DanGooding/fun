@@ -41,14 +41,9 @@ public class UnifierTest {
 
         // ACT
         Substitution s = Unifier.unifyTypes(left, right);
-        Type newLeft = left.applySubstitution(s);
-        Type newRight = right.applySubstitution(s);
 
         // ASSERT
-        assertThat(newLeft).isInstanceOf(TypeVariable.class);
-        assertThat(newRight).isInstanceOf(TypeVariable.class);
-        assertThat(((TypeVariable)newLeft).getName())
-            .isEqualTo(((TypeVariable)newRight).getName());
+        assertThat(left.applySubstitution(s)).isEqualTo(right.applySubstitution(s));
     }
 
     @Test
@@ -108,17 +103,17 @@ public class UnifierTest {
     @Test
     public void unifyTypes_substitutesArrow_forVariable() throws UnificationFailureException {
         // ARRANGE
-        Type left = new TypeVariable("a");
-        Type right = new TypeArrow(
+        Type left = new TypeArrow(
             new TypeVariable("b"),
             new TypeVariable("c")
         );
+        Type right = new TypeVariable("a");
 
         // ACT
         Substitution s = Unifier.unifyTypes(left, right);
 
         // ASSERT
-        assertThat(s.get("a")).isInstanceOf(TypeArrow.class);
+        assertThat(s.get("a")).isEqualTo(left);
     }
 
     @Test(expected = UnificationFailureException.class)

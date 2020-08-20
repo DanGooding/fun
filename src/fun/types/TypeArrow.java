@@ -1,5 +1,6 @@
 package fun.types;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -39,8 +40,19 @@ public class TypeArrow extends Type {
         );
     }
 
-    // implicit failure on anything else
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TypeArrow typeArrow = (TypeArrow) o;
+        return left.equals(typeArrow.left) &&
+            right.equals(typeArrow.right);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(left, right);
+    }
 
     @Override
     public String toString() {

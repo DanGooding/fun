@@ -49,6 +49,19 @@ public class TypeTuple extends Type {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TypeTuple typeTuple = (TypeTuple) o;
+        return elements.equals(typeTuple.elements);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(elements);
+    }
+
+    @Override
     public String toString() {
         return elements.stream()
             .map(Object::toString)
