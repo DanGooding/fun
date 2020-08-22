@@ -1,5 +1,6 @@
 package fun.types;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class Substitution {
      * returns a copy, but with any substitutions of the
      * named type variables removed
      */
-    Substitution without(List<String> names) {
+    Substitution without(Collection<String> names) {
         Map<String, Type> result = new HashMap<>(subst);
         for (String name : names) {
             result.remove(name);

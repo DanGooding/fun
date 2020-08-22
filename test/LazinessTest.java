@@ -1,6 +1,11 @@
 import fun.ast.*;
 import fun.eval.Environment;
 import fun.eval.EvaluationException;
+import fun.eval.Thunk;
+import fun.types.Inferer;
+import fun.types.Type;
+import fun.types.TypeEnvironment;
+import fun.types.TypeErrorException;
 import fun.values.IntegerValue;
 import fun.values.Value;
 import junit.framework.TestCase;
@@ -15,9 +20,14 @@ public class LazinessTest {
     // TODO: these don't need ot be static do they?
     static class FailOnEval extends ASTNode {
         @Override
-        public Value evaluate(Environment env) {
+        public Value evaluate(Environment<Thunk> env) {
             TestCase.fail("shouldn't evaluate this");
             return null;
+        }
+
+        @Override
+        public Type inferType(Inferer inferer, TypeEnvironment env) {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -32,9 +42,14 @@ public class LazinessTest {
         }
 
         @Override
-        public Value evaluate(Environment env) throws EvaluationException {
+        public Value evaluate(Environment<Thunk> env) throws EvaluationException {
             evalCount += 1;
             return inner.evaluate(env);
+        }
+
+        @Override
+        public Type inferType(Inferer inferer, TypeEnvironment env) {
+            throw new UnsupportedOperationException();
         }
 
         int getEvalCount() {

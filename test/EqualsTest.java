@@ -1,6 +1,6 @@
 import fun.ast.*;
 import fun.eval.EvaluationException;
-import fun.eval.TypeErrorException;
+import fun.eval.RuntimeTypeErrorException;
 import fun.values.BoolValue;
 import fun.values.Value;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class EqualsTest {
         assertThat(((BoolValue) result).getValue()).isFalse();
     }
 
-    @Test(expected = TypeErrorException.class)
+    @Test(expected = RuntimeTypeErrorException.class)
     public void equals_givesTypeError_forIntAndBool() throws EvaluationException {
         // ARRANGE
         ASTNode ast =

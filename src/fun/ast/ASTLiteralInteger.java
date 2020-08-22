@@ -4,6 +4,7 @@ import fun.eval.Environment;
 import fun.eval.EvaluationException;
 import fun.eval.PatternMatchFailedException;
 import fun.eval.Thunk;
+import fun.types.*;
 import fun.values.IntegerValue;
 import fun.values.Value;
 
@@ -20,12 +21,17 @@ public class ASTLiteralInteger extends ASTNode implements ASTMatchable {
     }
 
     @Override
-    public IntegerValue evaluate(Environment env) {
+    public IntegerValue evaluate(Environment<Thunk> env) {
         return new IntegerValue(this.value);
     }
 
     @Override
-    public void bindMatch(Thunk subject, Environment env) throws PatternMatchFailedException, EvaluationException {
+    public Type inferType(Inferer inferer, TypeEnvironment env) {
+        return new TypeInt();
+    }
+
+    @Override
+    public void bindMatch(Thunk subject, Environment<Thunk> env) throws PatternMatchFailedException, EvaluationException {
         Value subjectValue = subject.force();
         if (!(subjectValue instanceof IntegerValue) ||
             !this.value.equals(((IntegerValue) subjectValue).getValue())) {

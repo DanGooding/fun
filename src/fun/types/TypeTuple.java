@@ -11,7 +11,7 @@ public class TypeTuple extends Type {
     }
 
     @Override
-    public Type applySubstitution(Substitution s) {
+    public TypeTuple applySubstitution(Substitution s) {
         List<Type> modifiedElements =
             elements.stream().map(e -> e.applySubstitution(s)).collect(Collectors.toList());
         return new TypeTuple(modifiedElements);
@@ -46,6 +46,13 @@ public class TypeTuple extends Type {
         }
 
         return UnifyingAction.furtherUnify(constraints);
+    }
+
+    @Override
+    TypeTuple refreshVariableNames(VariableNameRefresher v) {
+        List<Type> modifiedElements =
+            elements.stream().map(e -> e.refreshVariableNames(v)).collect(Collectors.toList());
+        return new TypeTuple(modifiedElements);
     }
 
     @Override

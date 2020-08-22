@@ -10,6 +10,7 @@ interface Substitutable<T> {
 
     /**
      * return the free (unbound by forall.) type variables
+     * in a mutable Set
      */
     Set<String> freeTypeVariables();
 }

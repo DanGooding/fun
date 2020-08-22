@@ -8,11 +8,11 @@ public class Thunk {
     private boolean computed;
 
     private ASTNode expr;
-    private Environment env;
+    private Environment<Thunk> env;
 
     private Value value;
 
-    public Thunk(ASTNode expr, Environment env) {
+    public Thunk(ASTNode expr, Environment<Thunk> env) {
         computed = false;
         this.expr = expr;
         this.env = env;

@@ -6,7 +6,7 @@ import java.util.Set;
 public class TypeBool extends Type {
 
     @Override
-    public Type applySubstitution(Substitution s) {
+    public TypeBool applySubstitution(Substitution s) {
         return this;
     }
 
@@ -23,6 +23,11 @@ public class TypeBool extends Type {
     @Override
     UnifyingAction unifyWithBool(TypeBool b) {
         return UnifyingAction.doNothing();
+    }
+
+    @Override
+    TypeBool refreshVariableNames(VariableNameRefresher v) {
+        return new TypeBool();
     }
 
     @Override

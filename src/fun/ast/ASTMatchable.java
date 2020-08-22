@@ -16,7 +16,7 @@ public interface ASTMatchable {
      * @param env the environment to bind any variable names into
      * @throws PatternMatchFailedException if the value doesn't match the pattern
      */
-    void bindMatch(Thunk subject, Environment env) throws PatternMatchFailedException, EvaluationException;
+    void bindMatch(Thunk subject, Environment<Thunk> env) throws PatternMatchFailedException, EvaluationException;
     // TODO: track new variables bound this match, detect any name bound more than once -> exception
     //  (not a pattern match exception!! --- this is a syntax error (invalid pattern))
 

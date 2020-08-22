@@ -4,6 +4,7 @@ import fun.eval.Environment;
 import fun.eval.EvaluationException;
 import fun.eval.PatternMatchFailedException;
 import fun.eval.Thunk;
+import fun.types.*;
 import fun.values.Value;
 
 public class ASTLet extends ASTNode {
@@ -24,11 +25,11 @@ public class ASTLet extends ASTNode {
     }
 
     @Override
-    public Value evaluate(Environment env) throws EvaluationException {
+    public Value evaluate(Environment<Thunk> env) throws EvaluationException {
 
         // the environment the body will be evaluated in
         // has all the bindings of `env`, plus everything bound in the pattern match
-        Environment bodyEnv = new Environment(env);
+        Environment<Thunk> bodyEnv = new Environment<>(env);
 
         try {
             pattern.bindMatch(new Thunk(assigned, bodyEnv), bodyEnv);
@@ -38,6 +39,27 @@ public class ASTLet extends ASTNode {
         }
 
         return body.evaluate(bodyEnv);
+    }
+
+    @Override
+    public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
+
+        // TODO: implement pattern type inference
+        // TODO: remove ASTVar::getName
+        if (!(pattern instanceof ASTVar)) {
+            throw new UnsupportedOperationException();
+        }
+
+        ASTVar variable = (ASTVar)pattern;
+
+        // TODO: introduce type variable into env for lazy recursion
+        Type assignedType = assigned.inferType(inferer, env);
+        Scheme assignedPolyType = inferer.generalise(assignedType, env);
+
+        TypeEnvironment bodyEnv = new TypeEnvironment(env);
+        bodyEnv.bind(variable.getName(), assignedPolyType);
+
+        return body.inferType(inferer, bodyEnv);
     }
 
     @Override

@@ -16,7 +16,7 @@ public class TypeArrow extends Type {
     }
 
     @Override
-    public Type applySubstitution(Substitution s) {
+    public TypeArrow applySubstitution(Substitution s) {
         return new TypeArrow(left.applySubstitution(s), right.applySubstitution(s));
     }
 
@@ -37,6 +37,14 @@ public class TypeArrow extends Type {
         return UnifyingAction.furtherUnify(
             new Constraint(left, ar.left),
             new Constraint(right, ar.right)
+        );
+    }
+
+    @Override
+    TypeArrow refreshVariableNames(VariableNameRefresher v) {
+        return new TypeArrow(
+            left.refreshVariableNames(v),
+            right.refreshVariableNames(v)
         );
     }
 

@@ -6,7 +6,7 @@ import java.util.Set;
 public class TypeInt extends Type {
 
     @Override
-    public Type applySubstitution(Substitution s) {
+    public TypeInt applySubstitution(Substitution s) {
         return this;
     }
 
@@ -23,6 +23,11 @@ public class TypeInt extends Type {
     @Override
     UnifyingAction unifyWithInt(TypeInt i) {
         return UnifyingAction.doNothing();
+    }
+
+    @Override
+    TypeInt refreshVariableNames(VariableNameRefresher v) {
+        return new TypeInt();
     }
 
     @Override

@@ -3,46 +3,42 @@ package fun.eval;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Environment {  // TODO: make immutable
+public class Environment<T> {  // TODO: make immutable
 
-    private final Map<String, Thunk> bindings;
+    private Map<String, T> bindings;
 
-    // the enclosing environment
-    private final Environment outer;
-
-    public Environment(Map<String, Thunk> bindings, Environment outer) {
+    public Environment(Map<String, T> bindings) {
         this.bindings = new HashMap<>(bindings); // must create a mutable copy !
-        this.outer = outer;
     }
 
-    public Environment(Environment outer) {
-        this(Map.of(), outer);
+    public Environment(Environment<T> env) {
+        this(env.bindings);
     }
 
     public Environment() {
-        this(Map.of(), null);
+        this(Map.of());
     }
 
     /**
-     * mutating update
+     * mutating update: put a new binding
      */
-    public void bind(String name, Thunk thunk) {
-        bindings.put(name, thunk);
+    public void bind(String name, T value) {
+        bindings.put(name, value);
     }
 
-    public Thunk lookup(String name) throws EvaluationException {
-         if (bindings.containsKey(name)) {
-             return bindings.get(name);
-         }
-         if (outer == null) {
-             throw new EvaluationException(String.format("unbound variable '%s'", name));
-         }
-         return outer.lookup(name);
+    /**
+     * return the value associated with `name`, or null if `name` is unbound
+     */
+    public T lookup(String name) {
+         return bindings.get(name);
     }
 
     public boolean hasName(String name) {
-        // exploits short circuiting of || and &&
-        return bindings.containsKey(name) || (outer != null && outer.hasName(name));
+        return bindings.containsKey(name);
+    }
+
+    public Map<String, T> getBindings() {
+        return new HashMap<>(bindings);
     }
 
 }

@@ -23,7 +23,7 @@ public class ASTTuplePattern implements ASTMatchable {
     }
 
     @Override
-    public void bindMatch(Thunk subject, Environment env) throws PatternMatchFailedException, EvaluationException {
+    public void bindMatch(Thunk subject, Environment<Thunk> env) throws PatternMatchFailedException, EvaluationException {
         Value subjectValue = subject.force();
 
         if (!(subjectValue instanceof TupleValue)) {

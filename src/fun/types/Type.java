@@ -2,6 +2,9 @@ package fun.types;
 
 public abstract class Type implements Substitutable<Type> {
 
+    /**
+     * call the relevant unifyWithX method on t, depending on the type of this
+     */
     abstract UnifyingAction dispatchUnify(Type t) throws UnificationFailureException;
 
     UnifyingAction unifyWithVariable(TypeVariable tv) throws UnificationFailureException {
@@ -24,4 +27,10 @@ public abstract class Type implements Substitutable<Type> {
     UnifyingAction unifyWithAny(Type t) throws UnificationFailureException {
         throw new UnificationFailureException(this, t);
     }
+
+    /**
+     * construct a new equivalent Type, with type variables named consecutively in order of appearance
+     */
+    abstract Type refreshVariableNames(VariableNameRefresher v);
+
 }

@@ -3,6 +3,7 @@ package fun.ast;
 import fun.eval.Environment;
 import fun.eval.EvaluationException;
 import fun.eval.Thunk;
+import fun.types.*;
 import fun.values.Value;
 
 public class ASTVar extends ASTNode implements ASTMatchable {
@@ -13,13 +14,30 @@ public class ASTVar extends ASTNode implements ASTMatchable {
     }
 
     @Override
-    public Value evaluate(Environment env) throws EvaluationException { // TODO: specialise to name error or something
+    public Value evaluate(Environment<Thunk> env) throws EvaluationException { // TODO: specialise to name error or something
+        Thunk t = env.lookup(name);
+        if (t == null) {
+            throw new EvaluationException(String.format("unbound variable %s", name));
+        }
         return env.lookup(name).force();
     }
 
     @Override
-    public void bindMatch(Thunk subject, Environment env) {
+    public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
+        Scheme scheme = env.lookup(name);
+        if (scheme == null) {
+            throw new TypeErrorException(String.format("unbound variable %s", name));
+        }
+        return inferer.instantiate(scheme);
+    }
+
+    @Override
+    public void bindMatch(Thunk subject, Environment<Thunk> env) {
         env.bind(name, subject);
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

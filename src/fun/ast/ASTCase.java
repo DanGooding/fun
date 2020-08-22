@@ -4,6 +4,10 @@ import fun.eval.Environment;
 import fun.eval.EvaluationException;
 import fun.eval.PatternMatchFailedException;
 import fun.eval.Thunk;
+import fun.types.Inferer;
+import fun.types.Type;
+import fun.types.TypeEnvironment;
+import fun.types.TypeErrorException;
 import fun.values.Value;
 
 import java.util.List;
@@ -24,13 +28,13 @@ public class ASTCase extends ASTNode {
     }
 
     @Override
-    public Value evaluate(Environment env) throws EvaluationException {
+    public Value evaluate(Environment<Thunk> env) throws EvaluationException {
         Thunk subjectThunk = new Thunk(subject, env);
 
         for (ASTCaseOption option : options) {
 
             try {
-                Environment innerEnv = new Environment(env); // (cannot reuse)
+                Environment<Thunk> innerEnv = new Environment<>(env); // (cannot reuse)
 
                 option.pattern.bindMatch(subjectThunk, innerEnv);
 
@@ -44,6 +48,12 @@ public class ASTCase extends ASTNode {
 
         throw new EvaluationException("Non-exhaustive patterns in case");
 
+    }
+
+    @Override
+    public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
+        throw new UnsupportedOperationException(); // TODO: implement
+        // each case must unify with `subject`
     }
 
     @Override

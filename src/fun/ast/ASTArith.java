@@ -2,7 +2,9 @@ package fun.ast;
 
 import fun.eval.Environment;
 import fun.eval.EvaluationException;
-import fun.eval.TypeErrorException;
+import fun.eval.RuntimeTypeErrorException;
+import fun.eval.Thunk;
+import fun.types.*;
 import fun.values.IntegerValue;
 import fun.values.Value;
 
@@ -23,7 +25,7 @@ abstract class ASTArith extends ASTNode {
     abstract String operatorSymbol();
 
     @Override
-    public IntegerValue evaluate(Environment env) throws EvaluationException {
+    public IntegerValue evaluate(Environment<Thunk> env) throws EvaluationException {
         Value leftValue = left.evaluate(env);
         Value rightValue = right.evaluate(env);
 
@@ -32,8 +34,17 @@ abstract class ASTArith extends ASTNode {
             BigInteger rightOperand = ((IntegerValue) rightValue).getValue();
             return new IntegerValue(operator(leftOperand, rightOperand));
         }else {
-            throw new TypeErrorException("can only perform arithmetic on constant int value");
+            throw new RuntimeTypeErrorException("can only perform arithmetic on constant int value");
         }
+    }
+
+    @Override
+    public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
+        Type leftType = left.inferType(inferer, env);
+        Type rightType = right.inferType(inferer, env);
+        inferer.unify(leftType, new TypeInt());
+        inferer.unify(rightType, new TypeInt());
+        return new TypeInt();
     }
 
     @Override

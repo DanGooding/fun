@@ -1,11 +1,12 @@
 package fun.ast;
 
 import fun.eval.Environment;
-import fun.eval.EvaluationException;
 import fun.eval.Thunk;
+import fun.types.*;
 import fun.values.TupleValue;
 import fun.values.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +29,20 @@ public class ASTTuple extends ASTNode {
     }
 
     @Override
-    public Value evaluate(Environment env) {
+    public Value evaluate(Environment<Thunk> env) {
         List<Thunk> elementThunks = elements.stream().map(e -> new Thunk(e, env)).collect(Collectors.toList());
         return new TupleValue(elementThunks);
+    }
+
+    @Override
+    public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
+        List<Type> elementTypes = new ArrayList<>();
+        for (ASTNode element : elements) {
+            elementTypes.add(
+                element.inferType(inferer, env)
+            );
+        }
+        return new TypeTuple(elementTypes);
     }
 
     @Override

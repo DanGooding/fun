@@ -1,6 +1,7 @@
 package fun.ast;
 
 import fun.eval.*;
+import fun.types.*;
 import fun.values.FunctionValue;
 import fun.values.Value;
 
@@ -15,7 +16,7 @@ public class ASTApply extends ASTNode {
     }
 
     @Override
-    public Value evaluate(Environment env) throws EvaluationException {
+    public Value evaluate(Environment<Thunk> env) throws EvaluationException {
         Thunk argumentThunk = new Thunk(argument, env);
         Value possibleFunctionValue = function.evaluate(env);
 
@@ -23,7 +24,7 @@ public class ASTApply extends ASTNode {
             // TODO: this is awful naming
             FunctionValue funObj = (FunctionValue) possibleFunctionValue;
 
-            Environment internalEnv = new Environment(funObj.getCapturedEnv());
+            Environment<Thunk> internalEnv = new Environment<>(funObj.getCapturedEnv());
 
             try {
                 funObj.getParameterPattern().bindMatch(argumentThunk, internalEnv);
@@ -35,8 +36,21 @@ public class ASTApply extends ASTNode {
             return funObj.getBody().evaluate(internalEnv);
 
         }else {
-            throw new TypeErrorException("cannot apply a non-fun.values.FunctionValue");
+            throw new RuntimeTypeErrorException("cannot apply a non-fun.values.FunctionValue");
         }
+    }
+
+    @Override
+    public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
+
+        Type functionType = function.inferType(inferer, env);
+        Type argumentType = argument.inferType(inferer, env);
+
+        TypeVariable resultType = inferer.freshVariable();
+
+        inferer.unify(functionType, new TypeArrow(argumentType, resultType));
+
+        return resultType;
     }
 
     @Override

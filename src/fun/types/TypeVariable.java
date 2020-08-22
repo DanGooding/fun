@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class TypeVariable extends Type {
-    private String name;
+    private final String name;
 
     public TypeVariable(String name) {
         this.name = name;
@@ -26,6 +26,8 @@ public class TypeVariable extends Type {
         free.add(name);
         return free;
     }
+
+
 
     @Override
     UnifyingAction dispatchUnify(Type t) throws UnificationFailureException {
@@ -49,6 +51,11 @@ public class TypeVariable extends Type {
         }
 
         return UnifyingAction.substitute(name, t);
+    }
+
+    @Override
+    TypeVariable refreshVariableNames(VariableNameRefresher v) {
+        return new TypeVariable(v.refreshName(name));
     }
 
     @Override
