@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * maps variable names to type schemes
  */
-public class TypeEnvironment extends Environment<Scheme> implements Substitutable<TypeEnvironment> {
+public class TypeEnvironment extends Environment<TypeLike> implements Substitutable<TypeEnvironment> {
 
     public TypeEnvironment() {
         super();
@@ -23,8 +23,8 @@ public class TypeEnvironment extends Environment<Scheme> implements Substitutabl
     @Override
     public TypeEnvironment applySubstitution(Substitution s) {
         TypeEnvironment newEnv = new TypeEnvironment();
-        Map<String, Scheme> currentBindings = getBindings();
-        for (Map.Entry<String, Scheme> e : currentBindings.entrySet()) {
+        Map<String, TypeLike> currentBindings = getBindings();
+        for (Map.Entry<String, TypeLike> e : currentBindings.entrySet()) {
             newEnv.bind(
                 e.getKey(),
                 e.getValue().applySubstitution(s)
@@ -36,8 +36,8 @@ public class TypeEnvironment extends Environment<Scheme> implements Substitutabl
     @Override
     public Set<String> freeTypeVariables() {
         Set<String> free = new HashSet<>();
-        for (Scheme scheme : getBindings().values()) {
-            free.addAll(scheme.freeTypeVariables());
+        for (TypeLike t : getBindings().values()) {
+            free.addAll(t.freeTypeVariables());
         }
         return free;
     }

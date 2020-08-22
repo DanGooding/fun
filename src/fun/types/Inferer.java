@@ -22,7 +22,10 @@ public class Inferer {
     }
 
     public void unify(Type a, Type b) throws UnificationFailureException {
-        Substitution s = Unifier.unifyTypes(a, b);
+        Substitution s = Unifier.unifyTypes(
+            a.applySubstitution(globalSubstitution),
+            b.applySubstitution(globalSubstitution)
+        );
         globalSubstitution = globalSubstitution.compose(s);
     }
 

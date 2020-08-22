@@ -2,7 +2,7 @@ package fun.types;
 
 import java.util.*;
 
-public class Scheme implements Substitutable<Scheme> {
+public class Scheme implements TypeLike {
     private Set<String> quantified;
     private Type body;
 
@@ -40,6 +40,11 @@ public class Scheme implements Substitutable<Scheme> {
             newQuantified.add(v.refreshName(name));
         }
         return new Scheme(newQuantified, newBody);
+    }
+
+    @Override
+    public Type instantiate(Inferer inferer) {
+        return inferer.instantiate(this);
     }
 
     public Type getBody() {

@@ -24,11 +24,10 @@ public class ASTVar extends ASTNode implements ASTMatchable {
 
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
-        Scheme scheme = env.lookup(name);
-        if (scheme == null) {
+        if (!env.hasName(name)) {
             throw new TypeErrorException(String.format("unbound variable %s", name));
         }
-        return inferer.instantiate(scheme);
+        return env.lookup(name).instantiate(inferer);
     }
 
     @Override

@@ -43,7 +43,7 @@ public class ASTLambda extends ASTNode {
         TypeVariable parameterType = inferer.freshVariable();
 
         TypeEnvironment bodyEnv = new TypeEnvironment(env);
-        bodyEnv.bind(parameter.getName(), new Scheme(List.of(), parameterType));
+        bodyEnv.bind(parameter.getName(), parameterType); // introduce a monotype
 
         Type bodyType = body.inferType(inferer, bodyEnv);
 

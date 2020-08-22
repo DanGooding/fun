@@ -1,6 +1,6 @@
 package fun.types;
 
-public abstract class Type implements Substitutable<Type> {
+public abstract class Type implements TypeLike {
 
     /**
      * call the relevant unifyWithX method on t, depending on the type of this
@@ -33,4 +33,11 @@ public abstract class Type implements Substitutable<Type> {
      */
     abstract Type refreshVariableNames(VariableNameRefresher v);
 
+    @Override
+    public Type instantiate(Inferer inferer) {
+        return this;
+    }
+
+    @Override
+    public abstract Type applySubstitution(Substitution s);
 }

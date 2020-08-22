@@ -133,6 +133,40 @@ public class InfererTest {
     }
 
     @Test
+    public void inferType_handlesConvolutedId() throws TypeErrorException {
+        // ARRANGE
+        // let id = (lambda x -> let y = x in y) in id id
+        ASTNode expr =
+            new ASTLet("id",
+                new ASTLambda("x",
+                    new ASTLet("y",
+                        new ASTVar("x"),
+                        new ASTVar("y")
+                    )
+                ),
+                new ASTApply(
+                    new ASTVar("id"),
+                    new ASTVar("id")
+                )
+            );
+
+        // ACT
+        Scheme inferred = Inferer.inferType(expr);
+
+        // ASSERT
+        Scheme correct =
+            new Scheme(
+                List.of("a"),
+                new TypeArrow(
+                    new TypeVariable("a"),
+                    new TypeVariable("a")
+                )
+            );
+
+        assertEquivalent(inferred, correct);
+    }
+
+    @Test
     public void inferType_introducesPolyType_inLetBinding() throws TypeErrorException {
         // ARRANGE
         // let id = lambda x -> x in (id 1, id True)
