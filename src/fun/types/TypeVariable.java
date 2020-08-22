@@ -54,7 +54,7 @@ public class TypeVariable extends Type {
     }
 
     @Override
-    TypeVariable refreshVariableNames(VariableNameRefresher v) {
+    public TypeVariable refreshVariableNames(VariableNameRefresher v) {
         return new TypeVariable(v.refreshName(name));
     }
 

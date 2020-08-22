@@ -3,10 +3,10 @@ package fun.types;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TypeInt extends Type {
+public class TypeInteger extends Type {
 
     @Override
-    public TypeInt applySubstitution(Substitution s) {
+    public TypeInteger applySubstitution(Substitution s) {
         return this;
     }
 
@@ -21,13 +21,13 @@ public class TypeInt extends Type {
     }
 
     @Override
-    UnifyingAction unifyWithInt(TypeInt i) {
+    UnifyingAction unifyWithInt(TypeInteger i) {
         return UnifyingAction.doNothing();
     }
 
     @Override
-    TypeInt refreshVariableNames(VariableNameRefresher v) {
-        return new TypeInt();
+    public TypeInteger refreshVariableNames(VariableNameRefresher v) {
+        return new TypeInteger();
     }
 
     @Override

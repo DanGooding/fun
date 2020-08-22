@@ -14,7 +14,7 @@ public abstract class Type implements TypeLike {
     UnifyingAction unifyWithArrow(TypeArrow ar) throws UnificationFailureException {
         return unifyWithAny(ar);
     }
-    UnifyingAction unifyWithInt(TypeInt i) throws UnificationFailureException {
+    UnifyingAction unifyWithInt(TypeInteger i) throws UnificationFailureException {
         return unifyWithAny(i);
     }
     UnifyingAction unifyWithBool(TypeBool b) throws UnificationFailureException {
@@ -31,7 +31,8 @@ public abstract class Type implements TypeLike {
     /**
      * construct a new equivalent Type, with type variables named consecutively in order of appearance
      */
-    abstract Type refreshVariableNames(VariableNameRefresher v);
+    @Override
+    public abstract Type refreshVariableNames(VariableNameRefresher v);
 
     @Override
     public Type instantiate(Inferer inferer) {

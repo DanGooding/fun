@@ -55,7 +55,7 @@ public class SubstitutionTest {
         ));
 
         Substitution s2 = new Substitution(Map.of(
-            "c", new TypeInt(),
+            "c", new TypeInteger(),
             "d",
             new TypeArrow(
                 new TypeVariable("e"),

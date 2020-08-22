@@ -118,12 +118,12 @@ public class InfererTest {
             new Scheme(
                 List.of(),
                 new TypeArrow(
-                    new TypeInt(),
+                    new TypeInteger(),
                     new TypeArrow(
-                        new TypeInt(),
+                        new TypeInteger(),
                         new TypeArrow(
-                            new TypeInt(),
-                            new TypeInt()
+                            new TypeInteger(),
+                            new TypeInteger()
                         )
                     )
                 )
@@ -196,7 +196,7 @@ public class InfererTest {
             new Scheme(
                 List.of(),
                 new TypeTuple(List.of(
-                    new TypeInt(),
+                    new TypeInteger(),
                     new TypeBool()
                 ))
             );
@@ -269,8 +269,8 @@ public class InfererTest {
         Scheme correct =
             new Scheme(List.of(),
                 new TypeArrow(
-                    new TypeInt(),
-                    new TypeInt()
+                    new TypeInteger(),
+                    new TypeInteger()
                 )
             );
 
@@ -298,7 +298,7 @@ public class InfererTest {
                 List.of(),
                 new TypeArrow(
                     new TypeBool(),
-                    new TypeInt()
+                    new TypeInteger()
                 )
             );
 
@@ -358,9 +358,9 @@ public class InfererTest {
         Scheme correct =
             new Scheme(List.of(),
                 new TypeArrow(
-                    new TypeInt(),
+                    new TypeInteger(),
                     new TypeArrow(
-                        new TypeInt(),
+                        new TypeInteger(),
                         new TypeBool()
                     )
                 )
@@ -443,10 +443,10 @@ public class InfererTest {
             new Scheme(List.of(),
                 new TypeArrow(
                     new TypeTuple(List.of(
-                        new TypeInt(),
-                        new TypeInt()
+                        new TypeInteger(),
+                        new TypeInteger()
                     )),
-                    new TypeInt()
+                    new TypeInteger()
                 )
             );
 
@@ -492,10 +492,10 @@ public class InfererTest {
             new Scheme(List.of(),
                 new TypeArrow(
                     new TypeTuple(List.of(
-                        new TypeInt(),
-                        new TypeInt()
+                        new TypeInteger(),
+                        new TypeInteger()
                     )),
-                    new TypeInt()
+                    new TypeInteger()
                 )
             );
 

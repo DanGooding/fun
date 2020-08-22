@@ -42,9 +42,9 @@ abstract class ASTArith extends ASTNode {
     public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
         Type leftType = left.inferType(inferer, env);
         Type rightType = right.inferType(inferer, env);
-        inferer.unify(leftType, new TypeInt());
-        inferer.unify(rightType, new TypeInt());
-        return new TypeInt();
+        inferer.unify(leftType, new TypeInteger());
+        inferer.unify(rightType, new TypeInteger());
+        return new TypeInteger();
     }
 
     @Override

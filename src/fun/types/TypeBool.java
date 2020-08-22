@@ -26,7 +26,7 @@ public class TypeBool extends Type {
     }
 
     @Override
-    TypeBool refreshVariableNames(VariableNameRefresher v) {
+    public TypeBool refreshVariableNames(VariableNameRefresher v) {
         return new TypeBool();
     }
 

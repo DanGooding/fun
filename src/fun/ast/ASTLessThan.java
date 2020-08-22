@@ -41,8 +41,8 @@ public class ASTLessThan extends ASTNode {
         Type leftType = left.inferType(inferer, env);
         Type rightType = right.inferType(inferer, env);
 
-        inferer.unify(leftType, new TypeInt());
-        inferer.unify(rightType, new TypeInt());
+        inferer.unify(leftType, new TypeInteger());
+        inferer.unify(rightType, new TypeInteger());
 
         return new TypeBool();
     }

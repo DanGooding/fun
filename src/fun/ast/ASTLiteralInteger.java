@@ -27,7 +27,7 @@ public class ASTLiteralInteger extends ASTNode implements ASTMatchable {
 
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) {
-        return new TypeInt();
+        return new TypeInteger();
     }
 
     @Override

@@ -32,7 +32,8 @@ public class Scheme implements TypeLike {
      * construct a new equivalent Scheme, with type variables named
      * consecutively in order of appearance (in the body)
      */
-    Scheme refreshVariableNames(VariableNameRefresher v) {
+    @Override
+    public Scheme refreshVariableNames(VariableNameRefresher v) {
         Set<String> newQuantified = new HashSet<>();
         // all names (including quantified) are refreshed
         Type newBody = body.refreshVariableNames(v);

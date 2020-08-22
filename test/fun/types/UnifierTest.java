@@ -49,8 +49,8 @@ public class UnifierTest {
     @Test
     public void unifyTypes_givesEmptySubstitution_forIntInt() throws UnificationFailureException {
         // ARRANGE
-        Type left = new TypeInt();
-        Type right = new TypeInt();
+        Type left = new TypeInteger();
+        Type right = new TypeInteger();
 
         // ACT
         Substitution s = Unifier.unifyTypes(left, right);
@@ -79,7 +79,7 @@ public class UnifierTest {
         Type left = new TypeArrow(
             new TypeVariable("x"),
             new TypeArrow(
-                new TypeInt(),
+                new TypeInteger(),
                 new TypeVariable("z")
             )
         );
@@ -96,7 +96,7 @@ public class UnifierTest {
 
         // ASSERT
         assertThat(s.get("x")).isInstanceOf(TypeBool.class);
-        assertThat(s.get("y")).isInstanceOf(TypeInt.class);
+        assertThat(s.get("y")).isInstanceOf(TypeInteger.class);
         assertThat(s.get("z")).isInstanceOf(TypeBool.class);
     }
 
@@ -120,13 +120,13 @@ public class UnifierTest {
     public void unifyTypes_throws_forDifferentSizeTuples() throws UnificationFailureException {
         // ARRANGE
         Type left = new TypeTuple(List.of(
-            new TypeInt(),
+            new TypeInteger(),
             new TypeVariable("a"),
             new TypeBool()
         ));
 
         Type right = new TypeTuple(List.of(
-            new TypeInt(),
+            new TypeInteger(),
             new TypeBool()
         ));
 
@@ -149,7 +149,7 @@ public class UnifierTest {
             new TypeVariable("c"),
             new TypeVariable("d"),
             new TypeVariable("e"),
-            new TypeInt()
+            new TypeInteger()
         ));
 
         // ACT
@@ -158,11 +158,11 @@ public class UnifierTest {
         // ASSERT
         Map<String, Type> m = s.toMap();
 
-        assertThat(m.get("a")).isInstanceOf(TypeInt.class);
-        assertThat(m.get("b")).isInstanceOf(TypeInt.class);
-        assertThat(m.get("c")).isInstanceOf(TypeInt.class);
-        assertThat(m.get("d")).isInstanceOf(TypeInt.class);
-        assertThat(m.get("e")).isInstanceOf(TypeInt.class);
+        assertThat(m.get("a")).isInstanceOf(TypeInteger.class);
+        assertThat(m.get("b")).isInstanceOf(TypeInteger.class);
+        assertThat(m.get("c")).isInstanceOf(TypeInteger.class);
+        assertThat(m.get("d")).isInstanceOf(TypeInteger.class);
+        assertThat(m.get("e")).isInstanceOf(TypeInteger.class);
     }
 
 }

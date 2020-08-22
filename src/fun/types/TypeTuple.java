@@ -49,7 +49,7 @@ public class TypeTuple extends Type {
     }
 
     @Override
-    TypeTuple refreshVariableNames(VariableNameRefresher v) {
+    public TypeTuple refreshVariableNames(VariableNameRefresher v) {
         List<Type> modifiedElements =
             elements.stream().map(e -> e.refreshVariableNames(v)).collect(Collectors.toList());
         return new TypeTuple(modifiedElements);

@@ -41,7 +41,7 @@ public class TypeArrow extends Type {
     }
 
     @Override
-    TypeArrow refreshVariableNames(VariableNameRefresher v) {
+    public TypeArrow refreshVariableNames(VariableNameRefresher v) {
         return new TypeArrow(
             left.refreshVariableNames(v),
             right.refreshVariableNames(v)
