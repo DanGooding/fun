@@ -11,17 +11,17 @@ public class ASTLet extends ASTNode {
     // let <matchable> = <ast> in <ast>
 
     private final ASTMatchable pattern;
-    private final ASTNode assigned;
+    private final ASTNode subject;
     private final ASTNode body;
 
-    public ASTLet(ASTMatchable pattern, ASTNode assigned, ASTNode body) {
+    public ASTLet(ASTMatchable pattern, ASTNode subject, ASTNode body) {
         this.pattern = pattern;
-        this.assigned = assigned;
+        this.subject = subject;
         this.body = body;
     }
 
-    public ASTLet(String name, ASTNode assigned, ASTNode body) {
-        this(new ASTVar(name), assigned, body);
+    public ASTLet(String name, ASTNode subject, ASTNode body) {
+        this(new ASTVar(name), subject, body);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class ASTLet extends ASTNode {
         Environment<Thunk> bodyEnv = new Environment<>(env);
 
         try {
-            pattern.bindMatch(new Thunk(assigned, bodyEnv), bodyEnv);
+            pattern.bindMatch(new Thunk(subject, bodyEnv), bodyEnv);
 
         } catch (PatternMatchFailedException e) {
             throw new EvaluationException(e.getMessage());
@@ -53,17 +53,17 @@ public class ASTLet extends ASTNode {
         ASTVar variable = (ASTVar)pattern;
 
         // TODO: introduce type variable into env for lazy recursion
-        Type assignedType = assigned.inferType(inferer, env);
-        Scheme assignedPolyType = inferer.generalise(assignedType, env);
+        Type subjectType = subject.inferType(inferer, env);
+        Scheme subjectPolyType = inferer.generalise(subjectType, env);
 
         TypeEnvironment bodyEnv = new TypeEnvironment(env);
-        bodyEnv.bind(variable.getName(), assignedPolyType);
+        bodyEnv.bind(variable.getName(), subjectPolyType);
 
         return body.inferType(inferer, bodyEnv);
     }
 
     @Override
     public String toString() {
-        return String.format("(let %s = %s in %s)", pattern, assigned, body);
+        return String.format("(let %s = %s in %s)", pattern, subject, body);
     }
 }

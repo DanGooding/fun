@@ -16,7 +16,7 @@ public class InfererTest {
     }
 
     @Test
-    public void infersCorrectType_forIdentityLambda() throws TypeErrorException {
+    public void inferType_correct_forIdentityLambda() throws TypeErrorException {
         // ARRANGE
         ASTNode expr =
             new ASTLambda(
@@ -40,7 +40,7 @@ public class InfererTest {
     }
 
     @Test
-    public void infersCorrectType_forConstFunction() throws TypeErrorException {
+    public void inferType_correct_forConstFunction() throws TypeErrorException {
         // ARRANGE
         // lambda x -> lambda y -> x
         ASTNode expr =
@@ -65,6 +65,60 @@ public class InfererTest {
                     )
                 )
             );
+        assertEquivalent(inferred, correct);
+    }
+
+    @Test
+    public void inferType_correct_forSCombinator() throws TypeErrorException {
+        // ARRANGE
+        // S = \x -> \y -> \z -> x z (y z)
+        ASTNode expr =
+            new ASTLambda("x",
+                new ASTLambda("y",
+                    new ASTLambda("z",
+                        new ASTApply(
+                            new ASTApply(
+                                new ASTVar("x"),
+                                new ASTVar("z")
+                            ),
+                            new ASTApply(
+                                new ASTVar("y"),
+                                new ASTVar("z")
+                            )
+                        )
+                    )
+                )
+            );
+
+        // ACT
+        Scheme inferred = Inferer.inferType(expr);
+
+        // ASSERT
+        // (a -> b -> c) -> (a -> b) -> a -> c
+        Scheme correct =
+            new Scheme(
+                List.of("a", "b", "c"),
+                new TypeArrow(
+                    new TypeArrow(
+                        new TypeVariable("a"),
+                        new TypeArrow(
+                            new TypeVariable("b"),
+                            new TypeVariable("c")
+                        )
+                    ),
+                    new TypeArrow(
+                        new TypeArrow(
+                            new TypeVariable("a"),
+                            new TypeVariable("b")
+                        ),
+                        new TypeArrow(
+                            new TypeVariable("a"),
+                            new TypeVariable("c")
+                        )
+                    )
+                )
+            );
+
         assertEquivalent(inferred, correct);
     }
 
@@ -116,7 +170,6 @@ public class InfererTest {
         // ASSERT
         Scheme correct =
             new Scheme(
-                List.of(),
                 new TypeArrow(
                     new TypeInteger(),
                     new TypeArrow(
@@ -133,7 +186,7 @@ public class InfererTest {
     }
 
     @Test
-    public void inferType_handlesConvolutedId() throws TypeErrorException {
+    public void inferType_correct_forConvolutedIdFunction() throws TypeErrorException {
         // ARRANGE
         // let id = (lambda x -> let y = x in y) in id id
         ASTNode expr =
@@ -194,7 +247,6 @@ public class InfererTest {
         // ASSERT
         Scheme correct =
             new Scheme(
-                List.of(),
                 new TypeTuple(List.of(
                     new TypeInteger(),
                     new TypeBool()
@@ -267,7 +319,7 @@ public class InfererTest {
         // ASSERT
         // int -> int
         Scheme correct =
-            new Scheme(List.of(),
+            new Scheme(
                 new TypeArrow(
                     new TypeInteger(),
                     new TypeInteger()
@@ -295,7 +347,6 @@ public class InfererTest {
         // ASSERT
         Scheme correct =
             new Scheme(
-                List.of(),
                 new TypeArrow(
                     new TypeBool(),
                     new TypeInteger()
@@ -356,7 +407,7 @@ public class InfererTest {
 
         // ASSERT
         Scheme correct =
-            new Scheme(List.of(),
+            new Scheme(
                 new TypeArrow(
                     new TypeInteger(),
                     new TypeArrow(
@@ -372,6 +423,7 @@ public class InfererTest {
     @Test
     public void inferType_infersTupleArgument_onPatternMatch() throws TypeErrorException {
         // ARRANGE
+        // lambda (x,y,z,_) -> y
         ASTNode expr =
             new ASTLambda(
                 new ASTTuplePattern(List.of(
@@ -387,6 +439,7 @@ public class InfererTest {
         Scheme inferred = Inferer.inferType(expr);
 
         // ASSERT
+        // forall a b c d. (a,b,c,d) -> b
         Scheme correct =
             new Scheme(
                 List.of("a", "b", "c", "d"),
@@ -440,7 +493,7 @@ public class InfererTest {
 
         // ASSERT
         Scheme correct =
-            new Scheme(List.of(),
+            new Scheme(
                 new TypeArrow(
                     new TypeTuple(List.of(
                         new TypeInteger(),
@@ -489,7 +542,7 @@ public class InfererTest {
 
         // ASSERT
         Scheme correct =
-            new Scheme(List.of(),
+            new Scheme(
                 new TypeArrow(
                     new TypeTuple(List.of(
                         new TypeInteger(),
@@ -499,6 +552,154 @@ public class InfererTest {
                 )
             );
 
+        assertEquivalent(inferred, correct);
+    }
+
+    @Test
+    public void inferType_infersSubjectTypeFromPattern() throws TypeErrorException {
+        // ARRANGE
+        // lambda x -> let (3, y) = x in y
+        ASTNode expr =
+            new ASTLambda("x",
+                new ASTLet(
+                    new ASTTuplePattern(List.of(
+                        new ASTLiteralInteger(3),
+                        new ASTVar("y")
+                    )),
+                    new ASTVar("x"),
+                    new ASTVar("y")
+                )
+            );
+
+        // ACT
+        Scheme inferred = Inferer.inferType(expr);
+
+        // ASSERT
+        // forall a. (Int, a) -> a
+        Scheme correct =
+            new Scheme(
+                List.of("a"),
+                new TypeArrow(
+                    new TypeTuple(List.of(
+                        new TypeInteger(),
+                        new TypeVariable("a")
+                    )),
+                    new TypeVariable("a")
+                )
+            );
+        assertEquivalent(inferred, correct);
+    }
+
+    @Test
+    public void inferType_correct_forMutuallyRecursiveFunctions() throws TypeErrorException {
+        // ARRANGE
+        // let (even, odd) = (
+        //     lambda n -> if n == 0 then True else odd (n - 1),
+        //     lambda n -> if n == 0 then False else even (n - 1))
+        // in (even, odd)
+        ASTNode expr =
+            new ASTLet(
+                new ASTTuplePattern(List.of(
+                    new ASTVar("even"),
+                    new ASTVar("odd")
+                )),
+                new ASTTuple(List.of(
+                    new ASTLambda("n",
+                        new ASTIf(
+                            new ASTEquals(
+                                new ASTVar("n"),
+                                new ASTLiteralInteger(0)
+                            ),
+                            new ASTLiteralBool(true),
+                            new ASTApply(
+                                new ASTVar("odd"),
+                                new ASTMinus(
+                                    new ASTVar("n"),
+                                    new ASTLiteralInteger(1)
+                                )
+                            )
+                        )
+                    ),
+                    new ASTLambda("n",
+                        new ASTIf(
+                            new ASTEquals(
+                                new ASTVar("n"),
+                                new ASTLiteralInteger(0)
+                            ),
+                            new ASTLiteralBool(false),
+                            new ASTApply(
+                                new ASTVar("even"),
+                                new ASTMinus(
+                                    new ASTVar("n"),
+                                    new ASTLiteralInteger(1)
+                                )
+                            )
+                        )
+                    )
+                )),
+                new ASTTuple(List.of(
+                    new ASTVar("even"),
+                    new ASTVar("odd")
+                ))
+            );
+
+        // ACT
+        Scheme inferred = Inferer.inferType(expr);
+
+        // ASSERT
+        Scheme correct =
+            new Scheme(
+                new TypeTuple(List.of(
+                    new TypeArrow(
+                        new TypeInteger(),
+                        new TypeBool()
+                    ),
+                    new TypeArrow(
+                        new TypeInteger(),
+                        new TypeBool()
+                    )
+                ))
+            );
+
+        assertEquivalent(inferred, correct);
+    }
+
+    @Test(expected = TypeErrorException.class)
+    public void inferType_throws_forInfinitelyNestedTuple() throws TypeErrorException {
+        // ARRANGE
+        // let t = (1, t) in t
+        ASTNode expr =
+            new ASTLet("t",
+                new ASTTuple(List.of(
+                    new ASTLiteralInteger(1),
+                    new ASTVar("t")
+                )),
+                new ASTVar("t")
+            );
+
+        // ACT
+        Inferer.inferType(expr);
+    }
+
+    @Test
+    public void inferType_doesntThrow_forInfiniteRecursion() throws TypeErrorException {
+        // ARRANGE
+        // this is well typed, but doesn't halt when evaluated
+        // let x = x + 1 in x
+        ASTNode expr =
+            new ASTLet("x",
+                new ASTPlus(
+                    new ASTVar("x"),
+                    new ASTLiteralInteger(1)
+                ),
+                new ASTVar("x")
+            );
+
+        // ACT
+        Scheme inferred = Inferer.inferType(expr);
+
+        // ASSERT
+        Scheme correct = new Scheme(new TypeInteger());
         assertEquivalent(inferred, correct);
     }
 
