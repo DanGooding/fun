@@ -5,7 +5,9 @@ import fun.eval.Thunk;
 import fun.types.*;
 import fun.values.FunctionValue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ASTLambda extends ASTNode {
 
@@ -33,17 +35,13 @@ public class ASTLambda extends ASTNode {
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
 
-        // TODO: implement pattern type inference
-        // TODO: remove ASTVar::getName
-        if (!(parameterPattern instanceof ASTVar)) {
-            throw new UnsupportedOperationException();
-        }
-
-        ASTVar parameter = (ASTVar)parameterPattern;
-        TypeVariable parameterType = inferer.freshVariable();
+        Map<String, Type> newBindings = new HashMap<>();
+        Type parameterType = parameterPattern.inferPatternType(inferer, newBindings);
 
         TypeEnvironment bodyEnv = new TypeEnvironment(env);
-        bodyEnv.bind(parameter.getName(), parameterType); // introduce a monotype
+        for (String boundName : newBindings.keySet()) {
+            bodyEnv.bind(boundName, newBindings.get(boundName)); // introduce a monotype
+        }
 
         Type bodyType = body.inferType(inferer, bodyEnv);
 

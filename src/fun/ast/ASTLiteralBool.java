@@ -8,6 +8,8 @@ import fun.types.*;
 import fun.values.BoolValue;
 import fun.values.Value;
 
+import java.util.Map;
+
 public class ASTLiteralBool extends ASTNode implements ASTMatchable {
     private final boolean value;
 
@@ -32,6 +34,11 @@ public class ASTLiteralBool extends ASTNode implements ASTMatchable {
             ((BoolValue) subjectValue).getValue() != this.value) {
             throw new PatternMatchFailedException(this.toString());
         }
+    }
+
+    @Override
+    public Type inferPatternType(Inferer inferer, Map<String, Type> bindings) {
+        return new TypeBool();
     }
 
     @Override

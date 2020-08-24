@@ -6,6 +6,8 @@ import fun.eval.Thunk;
 import fun.types.*;
 import fun.values.Value;
 
+import java.util.Map;
+
 public class ASTVar extends ASTNode implements ASTMatchable {
     private final String name;
 
@@ -33,6 +35,17 @@ public class ASTVar extends ASTNode implements ASTMatchable {
     @Override
     public void bindMatch(Thunk subject, Environment<Thunk> env) {
         env.bind(name, subject);
+    }
+
+    @Override
+    public Type inferPatternType(Inferer inferer, Map<String, Type> bindings) throws TypeErrorException {
+        if (bindings.containsKey(name)) {
+            // cannot bind the same name twice in a pattern
+            throw new TypeErrorException(String.format("variable %s bound twice in pattern", name));
+        }
+        TypeVariable typeVariable = inferer.freshVariable();
+        bindings.put(name, typeVariable);
+        return typeVariable;
     }
 
     public String getName() {

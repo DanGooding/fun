@@ -4,11 +4,16 @@ import fun.eval.Environment;
 import fun.eval.EvaluationException;
 import fun.eval.PatternMatchFailedException;
 import fun.eval.Thunk;
+import fun.types.Inferer;
+import fun.types.Type;
+import fun.types.TypeErrorException;
 
+import java.util.Map;
+
+/**
+ * anything that can represent a pattern which values can be matched against
+ */
 public interface ASTMatchable {
-    // anything that can represents a pattern that values can be matched against
-
-    // TODO: a failed match is not exceptional -> is throwing an exception a bad way of communicating this ?
 
     /**
      * try to bind the value subject to this pattern
@@ -17,10 +22,14 @@ public interface ASTMatchable {
      * @throws PatternMatchFailedException if the value doesn't match the pattern
      */
     void bindMatch(Thunk subject, Environment<Thunk> env) throws PatternMatchFailedException, EvaluationException;
-    // TODO: track new variables bound this match, detect any name bound more than once -> exception
-    //  (not a pattern match exception!! --- this is a syntax error (invalid pattern))
-
     // TODO: allow binding names to sub patterns (@ in Haskell, `as` in OCaml)
+
+    /**
+     * infer the type of an expression that would match this pattern,
+     * recording the types of the introduced variables
+     */
+    Type inferPatternType(Inferer inferer, Map<String, Type> bindings) throws TypeErrorException;
+
 
 
     // TODO: don't pass down & modify an fun.eval.Environment, use a Map<String, fun.values.Value>  -- is this worse

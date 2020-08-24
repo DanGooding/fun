@@ -4,13 +4,12 @@ import fun.eval.Environment;
 import fun.eval.EvaluationException;
 import fun.eval.PatternMatchFailedException;
 import fun.eval.Thunk;
-import fun.types.Inferer;
-import fun.types.Type;
-import fun.types.TypeEnvironment;
-import fun.types.TypeErrorException;
+import fun.types.*;
 import fun.values.Value;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ASTCase extends ASTNode {
@@ -52,8 +51,26 @@ public class ASTCase extends ASTNode {
 
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
-        throw new UnsupportedOperationException(); // TODO: implement
+
         // each case must unify with `subject`
+        Type subjectType = subject.inferType(inferer, env);
+        Type resultType = inferer.freshVariable();
+
+        for (ASTCaseOption option : options) {
+            // TODO: this is identical to ASTLambda's
+            Map<String, Type> newBindings = new HashMap<>();
+            Type patternType = option.pattern.inferPatternType(inferer, newBindings);
+
+            TypeEnvironment bodyEnv = new TypeEnvironment(env);
+            for (String boundName : newBindings.keySet()) {
+                bodyEnv.bind(boundName, newBindings.get(boundName));
+            }
+            Type bodyType = option.body.inferType(inferer, bodyEnv);
+
+            inferer.unify(subjectType, patternType);
+            inferer.unify(bodyType, resultType);
+        }
+        return resultType;
     }
 
     @Override

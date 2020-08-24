@@ -9,6 +9,7 @@ import fun.values.IntegerValue;
 import fun.values.Value;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 public class ASTLiteralInteger extends ASTNode implements ASTMatchable {
     private final BigInteger value;
@@ -38,6 +39,11 @@ public class ASTLiteralInteger extends ASTNode implements ASTMatchable {
             // not an fun.values.IntegerValue, or has a different value to this:
             throw new PatternMatchFailedException(this.toString());
         }
+    }
+
+    @Override
+    public Type inferPatternType(Inferer inferer, Map<String, Type> bindings) {
+        return new TypeInteger();
     }
 
     @Override
