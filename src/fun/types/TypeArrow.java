@@ -7,8 +7,8 @@ import java.util.Set;
  * the type of functions: left -> right
  */
 public class TypeArrow extends Type {
-    private Type left;
-    private Type right;
+    private final Type left;
+    private final Type right;
 
     public TypeArrow(Type left, Type right) {
         this.left = left;

@@ -3,6 +3,7 @@ package fun;
 import fun.ast.ASTNode;
 import fun.eval.EvaluationException;
 import fun.parser.Parser;
+import fun.types.*;
 import fun.values.Value;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class Main {
 
         String filename;
         if (args.length == 0) {
-            filename = "program.txt";
+            filename = "code-samples/program.txt";
         }else {
             filename = args[0];
         }
@@ -31,12 +32,19 @@ public class Main {
             System.out.println();
 
             try {
+                Scheme type =
+                    Inferer
+                        .inferType(expr)
+                        .refreshVariableNames(new VariableNameRefresher());
+
+                System.out.println(type);
+
                 Value result = expr.evaluate();
                 result.fullyForce();
 
                 System.out.println(result);
 
-            } catch (EvaluationException e) {
+            } catch (TypeErrorException | EvaluationException e) {
                 System.out.println(e);
             }
 

@@ -10,7 +10,7 @@ public class VariableNameRefresher {
     private final NameSource nameSource;
     private final Map<String, String> nameMappings;
 
-    VariableNameRefresher() {
+    public VariableNameRefresher() {
         nameSource = new NameSource();
         nameMappings = new HashMap<>();
     }

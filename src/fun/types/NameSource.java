@@ -4,14 +4,18 @@ public class NameSource {
 
     private int nameIndex;
 
-    NameSource() {
+    public NameSource() {
         nameIndex = 0;
     }
 
     public String freshName() {
-        String name = String.format("%c%d", 'a' + nameIndex % 26, nameIndex / 26);
+        StringBuilder nameBuilder = new StringBuilder();
+        nameBuilder.append((char)('a' + nameIndex % 26));
+        if (nameIndex >= 26) {
+            nameBuilder.append(nameIndex / 26);
+        }
         nameIndex++;
-        return name;
+        return nameBuilder.toString();
     }
 
 }
