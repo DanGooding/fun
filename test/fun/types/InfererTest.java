@@ -383,6 +383,33 @@ public class InfererTest {
         assertEquivalent(inferred, correct);
     }
 
+    @Test
+    public void inferType_infersEqualsSubjectsSame() throws TypeErrorException {
+        // ARRANGE
+        // lambda x -> x == 3
+        ASTNode expr =
+            new ASTLambda("x",
+                new ASTEquals(
+                    new ASTVar("x"),
+                    new ASTLiteralInteger(3)
+                )
+            );
+
+        // ACT
+        Scheme inferred = Inferer.inferType(expr);
+
+        // ASSERT
+        Scheme correct =
+            new Scheme(
+                new TypeArrow(
+                    new TypeInteger(),
+                    new TypeBool()
+                )
+            );
+
+        assertEquivalent(inferred, correct);
+    }
+
     // PATTERN MATCHING
 
     @Test

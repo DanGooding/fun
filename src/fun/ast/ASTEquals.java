@@ -36,6 +36,10 @@ public class ASTEquals extends ASTNode {
             }else if (leftValue instanceof IntegerValue && rightValue instanceof IntegerValue) {
                 return new BoolValue(((IntegerValue) leftValue).getValue().equals(((IntegerValue) rightValue).getValue()));
 
+            }else if (leftValue.getClass() == rightValue.getClass()) {
+                throw new UnsupportedOperationException(
+                    String.format("equality on %s not implemented", leftValue.getClass().getSimpleName()));
+
             }else {
                 throw new RuntimeTypeErrorException("cannot equate values of different type");
             }
@@ -47,16 +51,15 @@ public class ASTEquals extends ASTNode {
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
         // TODO: implement proper equality types (ML style easier than typeclasses)
-        // instantiation of: forall a. a -> a -> Bool
-        TypeVariable var = inferer.freshVariable();
-        return
-            new TypeArrow(
-                var,
-                new TypeArrow(
-                    var,
-                    new TypeBool()
-                )
-            );
+
+        Type leftType = left.inferType(inferer, env);
+        Type rightType = right.inferType(inferer, env);
+
+        inferer.unify(leftType, rightType);
+
+        // TODO: cannot equate functions
+
+        return new TypeBool();
     }
 
     @Override

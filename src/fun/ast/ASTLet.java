@@ -46,12 +46,17 @@ public class ASTLet extends ASTNode {
 
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
-        // TODO: introduce type variable into env for lazy recursion
 
         Map<String, Type> newBindings = new HashMap<>();
         Type patternType = pattern.inferPatternType(inferer, newBindings);
 
-        Type subjectType = subject.inferType(inferer, env);
+        // bound variables available when typing subject to allow recursion
+        TypeEnvironment subjectEnv = new TypeEnvironment(env);
+        for (String boundName : newBindings.keySet()) {
+            subjectEnv.bind(boundName, newBindings.get(boundName));
+        }
+
+        Type subjectType = subject.inferType(inferer, subjectEnv);
         inferer.unify(patternType, subjectType);
 
         TypeEnvironment bodyEnv = new TypeEnvironment(env);
