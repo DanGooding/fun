@@ -33,9 +33,11 @@ public class Inferer {
      * generalise a type by closing over the free type variables with a forall
      */
     public Scheme generalise(Type t, TypeEnvironment env) {
-        Set<String> free = t.freeTypeVariables();
-        free.removeAll(env.freeTypeVariables());
-        return new Scheme(free, t);
+        // TODO: algorithm J doesn't apply E here, this is a bodge to allow pattern matching in `let`
+        Type et = t.applySubstitution(globalSubstitution);
+        Set<String> free = et.freeTypeVariables();
+        free.removeAll(env.applySubstitution(globalSubstitution).freeTypeVariables());
+        return new Scheme(free, et);
     }
 
     /**

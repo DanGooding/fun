@@ -48,10 +48,6 @@ public class ASTVar extends ASTNode implements ASTMatchable {
         return typeVariable;
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
     public String toString() {
         return name;

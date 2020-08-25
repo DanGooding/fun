@@ -7,6 +7,9 @@ import fun.eval.Thunk;
 import fun.types.*;
 import fun.values.Value;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ASTLet extends ASTNode {
     // let <matchable> = <ast> in <ast>
 
@@ -43,21 +46,20 @@ public class ASTLet extends ASTNode {
 
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
-
-        // TODO: implement pattern type inference
-        // TODO: remove ASTVar::getName
-        if (!(pattern instanceof ASTVar)) {
-            throw new UnsupportedOperationException();
-        }
-
-        ASTVar variable = (ASTVar)pattern;
-
         // TODO: introduce type variable into env for lazy recursion
+
+        Map<String, Type> newBindings = new HashMap<>();
+        Type patternType = pattern.inferPatternType(inferer, newBindings);
+
         Type subjectType = subject.inferType(inferer, env);
-        Scheme subjectPolyType = inferer.generalise(subjectType, env);
+        inferer.unify(patternType, subjectType);
 
         TypeEnvironment bodyEnv = new TypeEnvironment(env);
-        bodyEnv.bind(variable.getName(), subjectPolyType);
+        for (String boundName : newBindings.keySet()) {
+            Type boundType = newBindings.get(boundName);
+            Scheme boundPolytype = inferer.generalise(boundType, env);
+            bodyEnv.bind(boundName, boundPolytype);
+        }
 
         return body.inferType(inferer, bodyEnv);
     }

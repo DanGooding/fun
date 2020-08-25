@@ -774,7 +774,6 @@ public class InfererTest {
 
 
     // TODO: add lots more, incl difficult cases
-    // ASTCase (matching options & bodies)
     // in particular, once add lists, can infer e.g.
     //   (x : 1 : y : []) gives x, y :: Integer
 
