@@ -1,3 +1,5 @@
+package fun.parser;
+
 import fun.ast.ASTNode;
 import fun.eval.EvaluationException;
 import fun.parser.Parser;

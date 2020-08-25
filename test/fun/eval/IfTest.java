@@ -1,3 +1,5 @@
+package fun.eval;
+
 import fun.ast.ASTIf;
 import fun.ast.ASTLiteralBool;
 import fun.ast.ASTLiteralInteger;

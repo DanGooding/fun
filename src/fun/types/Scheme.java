@@ -1,10 +1,11 @@
 package fun.types;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Scheme implements TypeLike {
-    private Set<String> quantified;
-    private Type body;
+    private final Set<String> quantified;
+    private final Type body;
 
     public Scheme(Collection<String> quantified, Type body) {
         this.quantified = Set.copyOf(quantified);
@@ -58,11 +59,15 @@ public class Scheme implements TypeLike {
 
     @Override
     public String toString() {
-        return String.format(
-            "forall %s. %s",
-            String.join(" ", quantified),
-            body
-        );
+        if (quantified.isEmpty()) {
+            return body.toString();
+        }else {
+            return String.format(
+                "forall %s. %s",
+                quantified.stream().sorted().collect(Collectors.joining(" ")),
+                body
+            );
+        }
     }
 
     @Override

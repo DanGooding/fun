@@ -1,3 +1,5 @@
+package fun.eval;
+
 import fun.ast.*;
 import fun.eval.Environment;
 import fun.eval.EvaluationException;
@@ -5,7 +7,6 @@ import fun.eval.Thunk;
 import fun.types.Inferer;
 import fun.types.Type;
 import fun.types.TypeEnvironment;
-import fun.types.TypeErrorException;
 import fun.values.IntegerValue;
 import fun.values.Value;
 import junit.framework.TestCase;

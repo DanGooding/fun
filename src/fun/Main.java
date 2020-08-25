@@ -28,9 +28,6 @@ public class Main {
 
             ASTNode expr = p.parseExpr();
 
-            System.out.println(expr);
-            System.out.println();
-
             try {
                 Scheme type =
                     Inferer

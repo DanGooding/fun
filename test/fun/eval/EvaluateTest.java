@@ -1,3 +1,5 @@
+package fun.eval;
+
 import fun.ast.*;
 import fun.eval.EvaluationException;
 import fun.values.IntegerValue;
