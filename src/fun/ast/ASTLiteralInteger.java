@@ -17,6 +17,9 @@ public class ASTLiteralInteger extends ASTNode implements ASTMatchable {
     public ASTLiteralInteger(int value) {
         this(BigInteger.valueOf(value));
     }
+    public ASTLiteralInteger(String value) {
+        this(new BigInteger(value));
+    }
 
     @Override
     public IntegerValue evaluate(Environment<Thunk> env) {

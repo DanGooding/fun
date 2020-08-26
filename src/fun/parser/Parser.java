@@ -3,7 +3,6 @@ package fun.parser;
 import fun.ast.*;
 import fun.lexer.*;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -394,7 +393,7 @@ public class Parser {
     private ASTLiteralInteger parseInt() {
         Token t = currentToken;
         eat(TokenType.INTEGER);
-        return new ASTLiteralInteger(new BigInteger(t.string));
+        return new ASTLiteralInteger(t.string);
     }
 
     private ASTVar parseName() {
