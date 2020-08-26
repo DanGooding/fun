@@ -23,8 +23,22 @@ public class Tokenizer implements TokenStream {
             "False", TokenType.FALSE
         );
 
-    private static final String operatorChars = "+-*^=<>";
+    private static final String operatorChars = "+-*^=<>:";
+    private static final Map<String, TokenType> symbolicNonOperators =
+        Map.of(
+            "=", TokenType.ASSIGN_EQUALS,
+            "->", TokenType.ARROW
+        );
 
+    private static final Map<Character, TokenType> singleCharTokens =
+        Map.of(
+            '(', TokenType.OPEN_BRACKET,
+            ')', TokenType.CLOSE_BRACKET,
+            '[', TokenType.OPEN_SQUARE_BRACKET,
+            ']', TokenType.CLOSE_SQUARE_BRACKET,
+            ',', TokenType.COMMA,
+            '_', TokenType.UNDERSCORE
+        );
 
     private final CharStream inputStream;
 
@@ -47,6 +61,7 @@ public class Tokenizer implements TokenStream {
 
         FilePosition position = inputStream.getPosition();
 
+        // TODO: refactor
         if (isDigitChar(c)) {
             return readInteger();
 
@@ -59,21 +74,9 @@ public class Tokenizer implements TokenStream {
         } else if (isNewlineStartChar(c)) {
             return readNewline();
 
-        } else if (c == '(') {
+        } else if (singleCharTokens.containsKey(c)) {
             inputStream.advance();
-            return new Token(TokenType.OPEN_BRACKET, position);
-
-        } else if (c == ')') {
-            inputStream.advance();
-            return new Token(TokenType.CLOSE_BRACKET, position);
-
-        } else if (c == ',') {
-            inputStream.advance();
-            return new Token(TokenType.COMMA, position);
-
-        } else if (c == '_') { // TODO: combine this with readName ?
-            inputStream.advance();
-            return new Token(TokenType.UNDERSCORE, position);
+            return new Token(singleCharTokens.get(c), position);
         }
         // TODO: proper exception class here
         throw new RuntimeException(String.format("unknown token %s", position));
@@ -127,10 +130,8 @@ public class Tokenizer implements TokenStream {
         FilePosition position = inputStream.getPosition();
 
         String s = readWhile(this::isOperatorChar);
-        if (s.equals("->")) {
-            return new Token(TokenType.ARROW, position);
-        } else if (s.equals("=")) {
-            return new Token(TokenType.ASSIGN_EQUALS, position);
+        if (symbolicNonOperators.containsKey(s)) {
+            return new Token(symbolicNonOperators.get(s), position);
         }
         // allow user defined operators
         // check this is one once their declarations

@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class Parser {
 
@@ -19,6 +20,8 @@ public class Parser {
 
             "+", new OpInfo(6, Assoc.LEFT),
             "-", new OpInfo(6, Assoc.LEFT),
+
+            ":", new OpInfo(5, Assoc.RIGHT),
 
             "<", new OpInfo(4, Assoc.NONE),
             "==", new OpInfo(4, Assoc.NONE)
@@ -66,7 +69,6 @@ public class Parser {
     // TODO: parse methods that take parsers: ??
     //      <T> T parseBracketed(Supplier<T> parseElement)
 
-    // TODO: make private, all except a root parseProgram function
     public ASTNode parseExpr() {
 
         switch (currentToken.type) {
@@ -245,6 +247,10 @@ public class Parser {
                 combined = new ASTEquals(left, right);
                 break;
 
+            case ":":
+                combined = new ASTListCons(left, right);
+                break;
+
             default:
                 throw new RuntimeException("cannot parse operator " + op);
         }
@@ -282,6 +288,7 @@ public class Parser {
             case FALSE:
             case NAME:
             case OPEN_BRACKET:
+            case OPEN_SQUARE_BRACKET:
                 return true;
             default:
                 return false;
@@ -306,6 +313,9 @@ public class Parser {
             case OPEN_BRACKET:
                 return parseBracketedExpr();
 
+            case OPEN_SQUARE_BRACKET:
+                return parseListLiteral();
+
             default:
                 throw new RuntimeException("parse error in (base) expression");
         }
@@ -313,23 +323,43 @@ public class Parser {
     }
 
 
-    private ASTNode parseBracketedExpr() {
-        eat(TokenType.OPEN_BRACKET);
+    private <T> List<T> parseDelimited(Supplier<T> parseElement, TokenType start, TokenType delimiter, TokenType end) {
+        List<T> elements = new ArrayList<>();
 
-        List<ASTNode> exprs = new ArrayList<>();
-        while (currentToken.type != TokenType.CLOSE_BRACKET) {
-            if (exprs.size() > 0) {
-                eat(TokenType.COMMA);
+        eat(start);
+        while (currentToken.type != end) {
+            if (elements.size() > 0) {
+                eat(delimiter);
             }
-            exprs.add(parseExpr());
+            elements.add(parseElement.get());
         }
-        eat(TokenType.CLOSE_BRACKET);
+        eat(end);
+
+        return elements;
+    }
+
+    private ASTNode parseBracketedExpr() {
+        List<ASTNode> exprs = parseDelimited(
+            this::parseExpr,
+            TokenType.OPEN_BRACKET, TokenType.COMMA, TokenType.CLOSE_BRACKET);
 
         if (exprs.size() == 1) { // a bracketed expression
             return exprs.get(0);
         } else { // a tuple of 0, 2, 3, ... elements
             return new ASTTuple(exprs);
         }
+    }
+
+    private ASTNode parseListLiteral() {
+        List<ASTNode> elements = parseDelimited(
+            this::parseExpr,
+            TokenType.OPEN_SQUARE_BRACKET, TokenType.COMMA, TokenType.CLOSE_SQUARE_BRACKET);
+
+        ASTNode list = new ASTListNil();
+        for (int i = elements.size() - 1; i >= 0; i--) {
+            list = new ASTListCons(elements.get(i), list);
+        }
+        return list;
     }
 
     // TODO: add grammar to each parse function's documentation
@@ -359,17 +389,9 @@ public class Parser {
     }
 
     private ASTMatchable parseBracketedPattern() {
-        eat(TokenType.OPEN_BRACKET);
 
-        List<ASTMatchable> patterns = new ArrayList<>();
-
-        while (currentToken.type != TokenType.CLOSE_BRACKET) {
-            if (patterns.size() > 0) {
-                eat(TokenType.COMMA);  // a comma before each list element except the first
-            }
-            patterns.add(parsePattern());
-        }
-        eat(TokenType.CLOSE_BRACKET);
+        List<ASTMatchable> patterns =
+            parseDelimited(this::parsePattern, TokenType.OPEN_BRACKET, TokenType.COMMA, TokenType.CLOSE_BRACKET);
 
         if (patterns.size() == 1) { // just a random pair of brackets, ignore
             // TODO: matching against constructors here
