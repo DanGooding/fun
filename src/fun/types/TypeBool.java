@@ -44,5 +44,10 @@ public class TypeBool extends Type {
     public String toString() {
         return "Bool";
     }
+
+    @Override
+    public String prettyPrint() {
+        return "Bool";
+    }
 }
 

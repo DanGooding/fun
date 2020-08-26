@@ -42,6 +42,11 @@ public class TypeInteger extends Type {
 
     @Override
     public String toString() {
-        return "Int";
+        return "Integer";
+    }
+
+    @Override
+    public String prettyPrint() {
+        return "Integer";
     }
 }

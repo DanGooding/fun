@@ -41,4 +41,12 @@ public abstract class Type implements TypeLike {
 
     @Override
     public abstract Type applySubstitution(Substitution s);
+
+
+    public abstract String prettyPrint();
+
+    public String prettyPrintAsArrowLeftChild() {
+        return prettyPrint();
+    }
+
 }

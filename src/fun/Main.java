@@ -34,7 +34,7 @@ public class Main {
                         .inferType(expr)
                         .refreshVariableNames(new VariableNameRefresher());
 
-                System.out.println(type);
+                System.out.println(type.prettyPrint());
 
                 Value result = expr.evaluate();
                 result.fullyForce();

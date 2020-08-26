@@ -66,4 +66,14 @@ public class TypeArrow extends Type {
     public String toString() {
         return String.format("(%s) -> (%s)", left, right);
     }
+
+    @Override
+    public String prettyPrint() {
+        return String.format("%s -> %s", left.prettyPrintAsArrowLeftChild(), right.prettyPrint());
+    }
+
+    @Override
+    public String prettyPrintAsArrowLeftChild() {
+        return String.format("(%s)", prettyPrint());
+    }
 }

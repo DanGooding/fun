@@ -75,4 +75,9 @@ public class TypeVariable extends Type {
     public String toString() {
         return name;
     }
+
+    @Override
+    public String prettyPrint() {
+        return name;
+    }
 }

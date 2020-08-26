@@ -58,19 +58,6 @@ public class Scheme implements TypeLike {
     }
 
     @Override
-    public String toString() {
-        if (quantified.isEmpty()) {
-            return body.toString();
-        }else {
-            return String.format(
-                "forall %s. %s",
-                quantified.stream().sorted().collect(Collectors.joining(" ")),
-                body
-            );
-        }
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -82,5 +69,18 @@ public class Scheme implements TypeLike {
     @Override
     public int hashCode() {
         return Objects.hash(quantified, body);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "forall %s. %s",
+            String.join(" ", quantified),
+            body
+        );
+    }
+
+    public String prettyPrint() {
+        return body.prettyPrint();
     }
 }

@@ -74,4 +74,11 @@ public class TypeTuple extends Type {
             .map(Object::toString)
             .collect(Collectors.joining(", ", "(", ")"));
     }
+
+    @Override
+    public String prettyPrint() {
+        return elements.stream()
+            .map(Type::prettyPrint)
+            .collect(Collectors.joining(", ", "(", ")"));
+    }
 }
