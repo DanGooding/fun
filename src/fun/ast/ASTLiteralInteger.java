@@ -1,9 +1,6 @@
 package fun.ast;
 
-import fun.eval.Environment;
-import fun.eval.EvaluationException;
-import fun.eval.PatternMatchFailedException;
-import fun.eval.Thunk;
+import fun.eval.*;
 import fun.types.*;
 import fun.values.IntegerValue;
 import fun.values.Value;
@@ -34,9 +31,12 @@ public class ASTLiteralInteger extends ASTNode implements ASTMatchable {
     @Override
     public void bindMatch(Thunk subject, Environment<Thunk> env) throws PatternMatchFailedException, EvaluationException {
         Value subjectValue = subject.force();
-        if (!(subjectValue instanceof IntegerValue) ||
-            !this.value.equals(((IntegerValue) subjectValue).getValue())) {
-            // not an fun.values.IntegerValue, or has a different value to this:
+        if (!(subjectValue instanceof IntegerValue)) {
+            throw new RuntimeTypeErrorException(
+                String.format("cannot match %s against Integer", subjectValue.getClass().getSimpleName()));
+        }
+        IntegerValue integerSubject = (IntegerValue)subjectValue;
+        if (!this.value.equals(integerSubject.getValue())) {
             throw new PatternMatchFailedException(this.toString());
         }
     }

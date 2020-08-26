@@ -1,9 +1,6 @@
 package fun.ast;
 
-import fun.eval.Environment;
-import fun.eval.EvaluationException;
-import fun.eval.PatternMatchFailedException;
-import fun.eval.Thunk;
+import fun.eval.*;
 import fun.types.*;
 import fun.values.BoolValue;
 import fun.values.Value;
@@ -30,8 +27,12 @@ public class ASTLiteralBool extends ASTNode implements ASTMatchable {
     @Override
     public void bindMatch(Thunk subject, Environment<Thunk> env) throws PatternMatchFailedException, EvaluationException {
         Value subjectValue = subject.force();
-        if (!(subjectValue instanceof BoolValue) ||
-            ((BoolValue) subjectValue).getValue() != this.value) {
+        if (!(subjectValue instanceof BoolValue)) {
+            throw new RuntimeTypeErrorException(
+                String.format("cannot match %s against Bool", subjectValue.getClass().getSimpleName()));
+        }
+        BoolValue boolSubject = (BoolValue)subjectValue;
+        if (boolSubject.getValue() != this.value) {
             throw new PatternMatchFailedException(this.toString());
         }
     }

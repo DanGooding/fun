@@ -1,9 +1,6 @@
 package fun.ast;
 
-import fun.eval.Environment;
-import fun.eval.EvaluationException;
-import fun.eval.PatternMatchFailedException;
-import fun.eval.Thunk;
+import fun.eval.*;
 import fun.types.Inferer;
 import fun.types.Type;
 import fun.types.TypeErrorException;
@@ -33,12 +30,13 @@ public class ASTTuplePattern implements ASTMatchable {
         Value subjectValue = subject.force();
 
         if (!(subjectValue instanceof TupleValue)) {
-            throw new PatternMatchFailedException("tuple expected, got " + subject);
+            throw new RuntimeTypeErrorException(
+                String.format("cannot match %s against Tuple", subjectValue.getClass().getSimpleName()));
         }
         TupleValue tupleSubject = (TupleValue) subjectValue;
         if (tupleSubject.size() != this.size()) {
-            throw new PatternMatchFailedException(String.format(
-                "%d-tuple expected, got %d-tuple", this.size(), tupleSubject.size()));
+            throw new RuntimeTypeErrorException(String.format(
+                "cannot match %d-tuple against %d-tuple", tupleSubject.size(),this.size()));
         }
         for (int i = 0; i < size(); i++) {
             elements.get(i).bindMatch(tupleSubject.getElement(i), env);
