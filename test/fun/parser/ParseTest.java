@@ -71,4 +71,33 @@ public class ParseTest {
 
     // TODO: tuples, function application (inc multiple args)
 
+    @Test
+    public void parsesCons_inPatterns() throws EvaluationException {
+        // ARRANGE
+        String input = "let (x:y:z:zs) = [1,2,3,4,5] in z";
+        Parser p = new Parser(input);
+
+        // ACT
+        Value result = p.parseExpr().evaluate();
+
+        // ASSERT
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue)result).getValue().intValueExact()).isEqualTo(3);
+    }
+
+    @Test
+    public void doesntRequireBrackets_aroundCons_inCasePattern() {
+        // ARRANGE
+        String input =
+            "case [1,2,3] of\n" +
+                "    x : y : _ : [] -> y\n" +
+                "    x : xs -> x\n";
+        Parser p = new Parser(input);
+
+        // ACT
+        p.parseExpr();
+    }
+
+
+
 }

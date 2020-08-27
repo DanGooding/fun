@@ -1,7 +1,6 @@
 package fun.ast;
 
 import fun.eval.Environment;
-import fun.eval.EvaluationException;
 import fun.eval.Thunk;
 import fun.types.Inferer;
 import fun.types.Type;

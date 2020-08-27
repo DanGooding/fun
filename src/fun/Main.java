@@ -1,5 +1,6 @@
 package fun;
 
+import fun.ast.ASTLiteralBool;
 import fun.ast.ASTNode;
 import fun.eval.EvaluationException;
 import fun.parser.Parser;
@@ -31,7 +32,7 @@ public class Main {
             try {
                 Scheme type =
                     Inferer
-                        .inferType(expr)
+                        .inferType(new ASTLiteralBool(true))
                         .refreshVariableNames(new VariableNameRefresher());
 
                 System.out.println(type.prettyPrint());

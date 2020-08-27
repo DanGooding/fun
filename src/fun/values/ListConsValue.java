@@ -5,7 +5,7 @@ import fun.eval.Thunk;
 
 public class ListConsValue implements ConstantValue {
 
-    private final Thunk head; // TODO: is this in a thunk?
+    private final Thunk head;
     private final Thunk tail;
 
     public ListConsValue(Thunk head, Thunk tail) {
@@ -17,6 +17,14 @@ public class ListConsValue implements ConstantValue {
     public void fullyForce() throws EvaluationException {
         head.force().fullyForce();
         tail.force().fullyForce();
+    }
+
+    public Thunk getHead() {
+        return head;
+    }
+
+    public Thunk getTail() {
+        return tail;
     }
 
     @Override

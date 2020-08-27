@@ -69,13 +69,15 @@ public class Parser {
     // TODO: parse methods that take parsers: ??
     //      <T> T parseBracketed(Supplier<T> parseElement)
 
+    // TODO: add grammar to each parse function's documentation
+
     public ASTNode parseExpr() {
 
         switch (currentToken.type) {
 
             case LET: {
                 eat(TokenType.LET);
-                ASTMatchable pattern = parsePattern();
+                ASTMatchable pattern = parseBasePattern();
                 eat(TokenType.ASSIGN_EQUALS);
                 ASTNode assigned = parseExpr();
                 eat(TokenType.IN);
@@ -95,7 +97,7 @@ public class Parser {
 
             case LAMBDA: {
                 eat(TokenType.LAMBDA);
-                ASTMatchable param = parsePattern();
+                ASTMatchable param = parseBasePattern();
                 eat(TokenType.ARROW);
                 ASTNode body = parseExpr();
                 return new ASTLambda(param, body);
@@ -106,21 +108,17 @@ public class Parser {
                 ASTNode subject = parseExpr();
                 eat(TokenType.OF);
 
-                eat(TokenType.BLOCK_BEGIN);
-
-                List<ASTCaseOption> options = new ArrayList<>();
-                while (currentToken.type != TokenType.BLOCK_END) {  // TODO: a parseBlock function
-                    if (options.size() > 0) {
-                        eat(TokenType.BLOCK_DELIM);
-                    }
-
-                    ASTMatchable pattern = parsePattern();
-                    eat(TokenType.ARROW);
-                    ASTNode body = parseExpr();
-
-                    options.add(new ASTCaseOption(pattern, body));
-                }
-                eat(TokenType.BLOCK_END);
+                List<ASTCaseOption> options =
+                    parseDelimited(
+                        () -> {
+                            ASTMatchable pattern = parseOpenPattern();
+                            eat(TokenType.ARROW);
+                            ASTNode body = parseExpr();
+                            return new ASTCaseOption(pattern, body);
+                        },
+                        TokenType.BLOCK_BEGIN,
+                        TokenType.BLOCK_DELIM,
+                        TokenType.BLOCK_END);
 
                 return new ASTCase(subject, options);
             }
@@ -191,25 +189,25 @@ public class Parser {
         if (prevInfo.precedence > currentInfo.precedence) {
             return true;
 
-        } else if (prevInfo.precedence == currentInfo.precedence) {
+        } else if (prevInfo.precedence < currentInfo.precedence) {
+            return false;
 
-            if (prevInfo.associativity != currentInfo.associativity) {
-                throw new RuntimeException(String.format(
-                    "cannot mix %s (%s) and %s (%s)",
-                    prevOp, prevInfo,
-                    currentOp, currentInfo));
+        } else if (prevInfo.associativity != currentInfo.associativity) {
+            throw new RuntimeException(String.format(
+                "cannot mix %s (%s) and %s (%s)",
+                prevOp, prevInfo,
+                currentOp, currentInfo));
 
-            } else if (prevInfo.associativity == Assoc.NONE) { // both NONE
-                throw new RuntimeException(String.format(
-                    "cannot mix non-associative %s and %s",
-                    prevOp,
-                    currentOp));
+        } else if (prevInfo.associativity == Assoc.NONE) { // both NONE
+            throw new RuntimeException(String.format(
+                "cannot mix non-associative %s and %s",
+                prevOp,
+                currentOp));
 
-            } else if (prevInfo.associativity == Assoc.LEFT) { // both LEFT
-                return true;
-            }
+        } else {
+            // reduce for LEFT, not for RIGHT
+            return prevInfo.associativity == Assoc.LEFT;
         }
-        return false;
     }
 
     private void reduceOperatorStack(List<String> operatorStack, List<ASTNode> exprStack) {
@@ -362,8 +360,12 @@ public class Parser {
         return list;
     }
 
-    // TODO: add grammar to each parse function's documentation
-    private ASTMatchable parsePattern() {
+    private ASTMatchable parseBasePattern() {
+        // basePattern = NAME | UNDERSCORE
+        //             | INTEGER | TRUE | FALSE
+        //             | ( openPattern )
+        //             | ( openPattern , ... , openPattern )
+        //             | [ openPattern , ... , openPattern ]
 
         switch (currentToken.type) {
             case NAME:
@@ -383,15 +385,56 @@ public class Parser {
             case OPEN_BRACKET:
                 return parseBracketedPattern();
 
+            case OPEN_SQUARE_BRACKET:
+                return parseListPattern();
+
             default:
                 throw new RuntimeException("parse error in pattern");
         }
+
+    }
+
+    private ASTMatchable parseOpenPattern() {
+        // openPattern = basePattern : openPattern
+        //             | basePattern
+
+        // TODO: use operator stack parser here too
+
+        ASTMatchable firstPattern = parseBasePattern();
+        if (currentToken.type != TokenType.OPERATOR) {
+            return firstPattern;
+        }
+
+        List<ASTMatchable> patterns = new ArrayList<>();
+        patterns.add(firstPattern);
+
+        while (currentToken.type == TokenType.OPERATOR) {
+            if (!currentToken.string.equals(":")) {
+                throw new RuntimeException(
+                    String.format("unexpected operator in pattern: %s", currentToken.string));
+            }
+            eat(TokenType.OPERATOR);
+
+            patterns.add(parseBasePattern());
+        }
+
+        // build up cons pattern (last pattern is list, rest are elements)
+        ASTMatchable listPattern = patterns.remove(patterns.size() - 1);
+        while (!patterns.isEmpty()) {
+            listPattern = new ASTListConsPattern(
+                patterns.remove(patterns.size() - 1),
+                listPattern);
+        }
+
+        return listPattern;
     }
 
     private ASTMatchable parseBracketedPattern() {
+        // bracketedPattern = ( openPattern )
+        //                  | ( openPattern , ... )
 
         List<ASTMatchable> patterns =
-            parseDelimited(this::parsePattern, TokenType.OPEN_BRACKET, TokenType.COMMA, TokenType.CLOSE_BRACKET);
+            parseDelimited(this::parseOpenPattern, TokenType.OPEN_BRACKET, TokenType.COMMA, TokenType.CLOSE_BRACKET);
 
         if (patterns.size() == 1) { // just a random pair of brackets, ignore
             // TODO: matching against constructors here
@@ -400,6 +443,21 @@ public class Parser {
         } else { // a tuple
             return new ASTTuplePattern(patterns);
         }
+    }
+
+    private ASTMatchable parseListPattern() {
+        // listPattern = [ openPattern , ... ]
+
+        List<ASTMatchable> elements =
+            parseDelimited(
+                this::parseOpenPattern,
+                TokenType.OPEN_SQUARE_BRACKET, TokenType.COMMA, TokenType.CLOSE_SQUARE_BRACKET);
+
+        ASTMatchable pattern = new ASTListNil();
+        for (int i = elements.size() - 1; i >= 0; i--) {
+            pattern = new ASTListConsPattern(elements.get(i), pattern);
+        }
+        return pattern;
     }
 
 
