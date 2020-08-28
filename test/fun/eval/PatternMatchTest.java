@@ -1,7 +1,6 @@
 package fun.eval;
 
 import fun.ast.*;
-import fun.eval.EvaluationException;
 import fun.values.IntegerValue;
 import fun.values.Value;
 import org.junit.Test;
@@ -273,7 +272,48 @@ public class PatternMatchTest {
         assertThat(((IntegerValue) result).getValue().intValueExact()).isEqualTo(-1);
     }
 
+    @Test
+    public void matches_overListCons() throws EvaluationException {
+        // ARRANGE
+        // case [1,2,3] of
+        //     [] -> 0
+        //     x : y : _ -> y
+        ASTNode expr =
+            new ASTCase(
+                new ASTListCons(
+                    new ASTLiteralInteger(1),
+                    new ASTListCons(
+                        new ASTLiteralInteger(2),
+                        new ASTListCons(
+                            new ASTLiteralInteger(3),
+                            new ASTListNil()
+                        )
+                    )
+                ),
+                List.of(
+                    new ASTCaseOption(
+                        new ASTListNil(),
+                        new ASTLiteralInteger(0)
+                    ),
+                    new ASTCaseOption(
+                        new ASTListConsPattern(
+                            new ASTVar("x"),
+                            new ASTListConsPattern(
+                                new ASTVar("y"),
+                                new ASTUnderscore()
+                            )
+                        ),
+                        new ASTVar("y")
+                    )
+                )
+            );
 
+        // ACT
+        Value result = expr.evaluate();
 
+        // ASSERT
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue)result).getValue().intValueExact()).isEqualTo(2);
+    }
 
 }

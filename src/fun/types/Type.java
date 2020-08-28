@@ -23,6 +23,9 @@ public abstract class Type implements TypeLike {
     UnifyingAction unifyWithTuple(TypeTuple t) throws UnificationFailureException {
         return unifyWithAny(t);
     }
+    UnifyingAction unifyWithList(TypeList l) throws UnificationFailureException {
+        return unifyWithAny(l);
+    }
 
     UnifyingAction unifyWithAny(Type t) throws UnificationFailureException {
         throw new UnificationFailureException(this, t);

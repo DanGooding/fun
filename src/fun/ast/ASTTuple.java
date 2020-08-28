@@ -16,11 +16,9 @@ public class ASTTuple extends ASTNode {
     private final List<ASTNode> elements;
 
     public ASTTuple(List<ASTNode> elements) {
-//        if (contents.length == 1) {
-//            // not really a 'type' error
-//            throw new UnsupportedOperationException("1-tuples not possible");
-//        }
-
+        if (elements.size() == 1) {
+            throw new UnsupportedOperationException("1-tuples not possible");
+        }
         this.elements = List.copyOf(elements);
     }
 

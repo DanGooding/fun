@@ -35,6 +35,9 @@ public enum TokenType {
     OPEN_BRACKET,
     CLOSE_BRACKET,
 
+    OPEN_SQUARE_BRACKET,
+    CLOSE_SQUARE_BRACKET,
+
     COMMA,
 
     UNDERSCORE,

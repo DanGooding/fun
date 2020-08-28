@@ -1,5 +1,6 @@
 package fun;
 
+import fun.ast.ASTLiteralBool;
 import fun.ast.ASTNode;
 import fun.eval.EvaluationException;
 import fun.parser.Parser;
