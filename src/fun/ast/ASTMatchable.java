@@ -30,12 +30,4 @@ public interface ASTMatchable {
      */
     Type inferPatternType(Inferer inferer, Map<String, Type> bindings) throws TypeErrorException;
 
-
-
-    // TODO: don't pass down & modify an fun.eval.Environment, use a Map<String, fun.values.Value>  -- is this worse
-    //       and then once all bindings done, create a new environment
-    //       giving proper immutability to environments
-    //   one worker function to recurse with Map<String, fun.values.Value>,
-    //   one wrapper function to create a new fun.eval.Environment with those bindings
-    //   maybe a candidateBindings type ? - that detects duplicate bindings & throws an error
 }

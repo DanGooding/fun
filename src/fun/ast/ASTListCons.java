@@ -2,10 +2,7 @@ package fun.ast;
 
 import fun.eval.Environment;
 import fun.eval.Thunk;
-import fun.types.Inferer;
-import fun.types.Type;
-import fun.types.TypeEnvironment;
-import fun.types.TypeErrorException;
+import fun.types.*;
 import fun.values.ListConsValue;
 import fun.values.Value;
 
@@ -29,7 +26,10 @@ public class ASTListCons extends ASTNode {
 
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) throws TypeErrorException {
-        throw new UnsupportedOperationException();
+        Type headType = head.inferType(inferer, env);
+        Type tailType = tail.inferType(inferer, env);
+        inferer.unify(new TypeList(headType), tailType);
+        return tailType;
     }
 
     @Override

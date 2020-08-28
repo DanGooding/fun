@@ -32,7 +32,7 @@ public class Main {
             try {
                 Scheme type =
                     Inferer
-                        .inferType(new ASTLiteralBool(true))
+                        .inferType(expr)
                         .refreshVariableNames(new VariableNameRefresher());
 
                 System.out.println(type.prettyPrint());

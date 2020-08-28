@@ -4,6 +4,7 @@ import fun.eval.*;
 import fun.types.Inferer;
 import fun.types.Type;
 import fun.types.TypeErrorException;
+import fun.types.TypeList;
 import fun.values.ListConsValue;
 import fun.values.ListNilValue;
 import fun.values.Value;
@@ -40,7 +41,12 @@ public class ASTListConsPattern implements ASTMatchable {
 
     @Override
     public Type inferPatternType(Inferer inferer, Map<String, Type> bindings) throws TypeErrorException {
-        throw new UnsupportedOperationException();
+        Type headType = headPattern.inferPatternType(inferer, bindings);
+        Type tailType = tailPattern.inferPatternType(inferer, bindings);
+
+        inferer.unify(new TypeList(headType), tailType);
+
+        return tailType;
     }
 
     @Override

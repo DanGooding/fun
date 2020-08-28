@@ -19,7 +19,7 @@ public class ASTListNil extends ASTNode implements ASTMatchable {
 
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) {
-        throw new UnsupportedOperationException();
+        return inferer.freshVariable();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ASTListNil extends ASTNode implements ASTMatchable {
 
     @Override
     public Type inferPatternType(Inferer inferer, Map<String, Type> bindings) throws TypeErrorException {
-        throw new UnsupportedOperationException();
+        return inferer.freshVariable();
     }
 
     @Override

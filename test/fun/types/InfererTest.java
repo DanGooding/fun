@@ -799,9 +799,77 @@ public class InfererTest {
         assertEquivalent(inferred, correct);
     }
 
+    // LISTS
 
-    // TODO: add lots more, incl difficult cases
-    // in particular, once add lists, can infer e.g.
-    //   (x : 1 : y : []) gives x, y :: Integer
+    @Test
+    public void inferType_infersListElements_allHaveSameType() throws TypeErrorException {
+        // ARRANGE
+        // lambda x -> [1, x, 3]
+        ASTNode expr =
+            new ASTLambda("x",
+                new ASTListCons(
+                    new ASTLiteralInteger(1),
+                    new ASTListCons(
+                        new ASTVar("x"),
+                        new ASTListCons(
+                            new ASTLiteralInteger(3),
+                            new ASTListNil()
+                        )
+                    )
+                )
+            );
+
+        // ACT
+        Scheme inferred = Inferer.inferType(expr);
+
+        // ASSERT
+        // int -> [int]
+        Scheme correct =
+            new Scheme(
+                new TypeArrow(
+                    new TypeInteger(),
+                    new TypeList(
+                        new TypeInteger()
+                    )
+                )
+            );
+
+        assertEquivalent(inferred, correct);
+    }
+
+    @Test
+    public void inferType_unifiesAcrossListPatternMatches() throws TypeErrorException {
+        // ARRANGE
+        // lambda (x : 2 : xs) -> x : xs
+        ASTNode expr =
+            new ASTLambda(
+                new ASTListConsPattern(
+                    new ASTVar("x"),
+                    new ASTListConsPattern(
+                        new ASTLiteralInteger(2),
+                        new ASTVar("xs")
+                    )
+                ),
+                new ASTListCons(
+                    new ASTVar("x"),
+                    new ASTVar("xs")
+                )
+            );
+
+        // ACT
+        Scheme inferred = Inferer.inferType(expr);
+
+        // ASSERT
+        // [int] -> [int]
+        Scheme correct =
+            new Scheme(
+                new TypeArrow(
+                    new TypeList(new TypeInteger()),
+                    new TypeList(new TypeInteger())
+                )
+            );
+
+        assertEquivalent(inferred, correct);
+    }
 
 }
