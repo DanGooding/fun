@@ -872,7 +872,23 @@ public class InfererTest {
         assertEquivalent(inferred, correct);
     }
 
-//    @Test
-//    public void inferType_correct_for
+    @Test
+    public void inferType_infersPolymorphicList_forNilLiteral() throws TypeErrorException {
+        // ARRANGE
+        ASTNode expr = new ASTListNil();
+
+        // ACT
+        Scheme inferred = Inferer.inferType(expr);
+
+        // ASSERT
+        Scheme correct =
+            new Scheme(
+                List.of("a"),
+                new TypeList(
+                    new TypeVariable("a")
+                )
+            );
+        assertEquivalent(inferred, correct);
+    }
 
 }

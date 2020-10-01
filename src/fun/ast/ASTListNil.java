@@ -1,10 +1,7 @@
 package fun.ast;
 
 import fun.eval.*;
-import fun.types.Inferer;
-import fun.types.Type;
-import fun.types.TypeEnvironment;
-import fun.types.TypeErrorException;
+import fun.types.*;
 import fun.values.ListConsValue;
 import fun.values.ListNilValue;
 import fun.values.Value;
@@ -19,7 +16,7 @@ public class ASTListNil extends ASTNode implements ASTMatchable {
 
     @Override
     public Type inferType(Inferer inferer, TypeEnvironment env) {
-        return inferer.freshVariable();
+        return new TypeList(inferer.freshVariable());
     }
 
     @Override
