@@ -30,7 +30,7 @@ public class Parser {
     private final TokenStream tokenStream;
     private Token currentToken;
 
-    public Parser(String input) {
+    private Parser(String input) {
         tokenStream = new BlockMaker(new Tokenizer(input));
         advance();
     }
@@ -63,14 +63,23 @@ public class Parser {
 
     // TODO: proper ParseErrorException ?
 
-    // TODO: throw if EOF not reached at end (eg some invalid stuff before EOF)
-
     // TODO: parse methods that take parsers: ??
     //      <T> T parseBracketed(Supplier<T> parseElement)
 
     // TODO: add grammar to each parse function's documentation
 
-    public ASTNode parseExpr() {
+    public static ASTNode parseWholeExpr(String input) {
+        Parser p = new Parser(input);
+        return p.parseWhole(p::parseExpr);
+    }
+
+    private <T> T parseWhole(Supplier<T> parseItem) {
+        T item = parseItem.get();
+        eat(TokenType.EOF);
+        return item;
+    }
+
+    private ASTNode parseExpr() {
 
         switch (currentToken.type) {
 

@@ -16,10 +16,9 @@ public class ParseTest {
     public void worksCorrectly_forLeftAssoc() throws EvaluationException {
         // ARRANGE
         String input = "1 + 2 * 3 - 4 * 5";
-        Parser p = new Parser(input);
 
         // ACT
-        ASTNode ast = p.parseExpr();
+        ASTNode ast = Parser.parseWholeExpr(input);
         Value result = ast.evaluate();
 
         // ASSERT
@@ -31,10 +30,9 @@ public class ParseTest {
     public void worksCorrectly_forRightAssoc() throws EvaluationException {
         // ARRANGE
         String input = "4 ^ 3 ^ 2 ^ 1";
-        Parser p = new Parser(input);
 
         // ACT
-        ASTNode ast = p.parseExpr();
+        ASTNode ast = Parser.parseWholeExpr(input);
         Value result = ast.evaluate();
 
         // ASSERT
@@ -46,10 +44,9 @@ public class ParseTest {
     public void worksCorrectly_forAssocMixture() throws EvaluationException {
         // ARRANGE
         String input = "1 + 2 - 3 * 4 * 5 ^ 2 * 3 - 4 ^ 2 ^ 0 - 1 + 1000 == 10 * 9 + 2 ^ 3";
-        Parser p = new Parser(input);
 
         // ACT
-        ASTNode ast = p.parseExpr();
+        ASTNode ast = Parser.parseWholeExpr(input);
         Value result = ast.evaluate();
 
         // ASSERT
@@ -61,10 +58,9 @@ public class ParseTest {
     public void throws_forMultipleNonAssociative() throws EvaluationException {
         // ARRANGE
         String input = "1 == 2 == 3";
-        Parser p = new Parser(input);
 
         // ACT
-        ASTNode ast = p.parseExpr();
+        ASTNode ast = Parser.parseWholeExpr(input);
         Value result = ast.evaluate();
 
     }
@@ -75,10 +71,9 @@ public class ParseTest {
     public void parsesCons_inPatterns() throws EvaluationException {
         // ARRANGE
         String input = "let (x:y:z:zs) = [1,2,3,4,5] in z";
-        Parser p = new Parser(input);
 
         // ACT
-        Value result = p.parseExpr().evaluate();
+        Value result = Parser.parseWholeExpr(input).evaluate();
 
         // ASSERT
         assertThat(result).isInstanceOf(IntegerValue.class);
@@ -92,12 +87,39 @@ public class ParseTest {
             "case [1,2,3] of\n" +
                 "    x : y : _ : [] -> y\n" +
                 "    x : xs -> x\n";
-        Parser p = new Parser(input);
 
         // ACT
-        p.parseExpr();
+        Parser.parseWholeExpr(input);
     }
 
+    @Test
+    public void allowsLeadingAndTrailingWhitespace() {
+        // ARRANGE
+        String input = "     1 + 2 * 3    ";
+
+        // ACT
+        Parser.parseWholeExpr(input);
+    }
+
+    @Test
+    public void allowsComments() throws EvaluationException {
+        // ARRANGE
+        String input = "" +
+            "# this adds one and two\n" +
+            "1  # this is one\n" +
+            "+  # this is the addition operator\n" +
+            "2  # this is two\n" +
+            "# the answer\n" +
+            "# will be three\n";
+
+        // ACT
+        ASTNode expr = Parser.parseWholeExpr(input);
+        Value result = expr.evaluate();
+
+        // ASSERT
+        assertThat(result).isInstanceOf(IntegerValue.class);
+        assertThat(((IntegerValue)result).getValue().intValueExact()).isEqualTo(3);
+    }
 
 
 }

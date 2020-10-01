@@ -40,6 +40,8 @@ public class Tokenizer implements TokenStream {
             '_', TokenType.UNDERSCORE
         );
 
+    private static final char commentStart = '#';
+
     private final CharStream inputStream;
 
     public Tokenizer(String input) {
@@ -55,10 +57,21 @@ public class Tokenizer implements TokenStream {
             return new Token(TokenType.EOF, inputStream.getPosition());
         }
 
-        readWhile(this::isWhitespace);
+        boolean atRealToken = false;
+        while (!atRealToken) {
+            if (inputStream.atEOF()) {
+                return new Token(TokenType.EOF, inputStream.getPosition());
+            } else if (isWhitespace(inputStream.peekChar())) {
+                readWhile(this::isWhitespace);
+                continue;
+            } else if (isCommentStartChar(inputStream.peekChar())) {
+                readComment();
+                continue;
+            }
+            atRealToken = true;
+        }
 
         char c = inputStream.peekChar();
-
         FilePosition position = inputStream.getPosition();
 
         // TODO: refactor
@@ -80,8 +93,6 @@ public class Tokenizer implements TokenStream {
         }
         // TODO: proper exception class here
         throw new RuntimeException(String.format("unknown token %s", position));
-
-        // TODO: allow comments
     }
 
     // TODO: allow tabs (constant width or tabstops?)
@@ -89,6 +100,14 @@ public class Tokenizer implements TokenStream {
         return c == ' ';
     }
 
+    private boolean isCommentStartChar(char c) {
+        return c == commentStart;
+    }
+
+    // stops just before a newline, or EOF
+    private String readComment() {
+        return readWhile(c -> !isNewlineStartChar(c));
+    }
 
     private boolean isDigitChar(char c) {
         return Character.isDigit(c);

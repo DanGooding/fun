@@ -25,9 +25,7 @@ public class Main {
         try {
             String content = Files.readString(Paths.get(filename));
 
-            Parser p = new Parser(content);
-
-            ASTNode expr = p.parseExpr();
+            ASTNode expr = Parser.parseWholeExpr(content);
 
             try {
                 Scheme type =

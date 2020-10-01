@@ -872,4 +872,7 @@ public class InfererTest {
         assertEquivalent(inferred, correct);
     }
 
+//    @Test
+//    public void inferType_correct_for
+
 }
