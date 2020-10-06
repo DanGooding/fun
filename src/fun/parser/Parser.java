@@ -12,17 +12,17 @@ public class Parser {
     // TODO: this can change as user defined operators are added
     private static final Map<String, OpInfo> operatorInfo =
         Map.of(
-            "^", new OpInfo(8, Assoc.RIGHT),
+            "^", new OpInfo(8, Assoc.RIGHT, ASTPow::new),
 
-            "*", new OpInfo(7, Assoc.LEFT),
+            "*", new OpInfo(7, Assoc.LEFT, ASTMult::new),
 
-            "+", new OpInfo(6, Assoc.LEFT),
-            "-", new OpInfo(6, Assoc.LEFT),
+            "+", new OpInfo(6, Assoc.LEFT, ASTPlus::new),
+            "-", new OpInfo(6, Assoc.LEFT, ASTMinus::new),
 
-            ":", new OpInfo(5, Assoc.RIGHT),
+            ":", new OpInfo(5, Assoc.RIGHT, ASTListCons::new),
 
-            "<", new OpInfo(4, Assoc.NONE),
-            "==", new OpInfo(4, Assoc.NONE)
+            "<", new OpInfo(4, Assoc.NONE, ASTLessThan::new),
+            "==", new OpInfo(4, Assoc.NONE, ASTEquals::new)
         );
 
 
@@ -46,13 +46,15 @@ public class Parser {
      * otherwise raise an exception
      */
     private void eat(TokenType type) throws ParseErrorException {
-        if (currentToken.type == type) {
+        if (currentToken.getType() == type) {
             advance();
         } else {
             // TODO: the expected token is possibly not the most useful thing, eg:
             // let t = (1, 2 in t
             // gives 'expected COMMA', rather than close bracket
-            throw new ParseErrorException(currentToken.position, String.format("expected %s", type));
+            throw new ParseErrorException(
+                currentToken.getPosition(),
+                String.format("unexpected %s (expected %s)", currentToken, type));
         }
     }
 
@@ -72,7 +74,7 @@ public class Parser {
 
     private ASTNode parseExpr() throws ParseErrorException {
 
-        switch (currentToken.type) {
+        switch (currentToken.getType()) {
 
             case LET: {
                 eat(TokenType.LET);
@@ -128,7 +130,7 @@ public class Parser {
 
                 } else {
                     throw new ParseErrorException(
-                        currentToken.position,
+                        currentToken.getPosition(),
                         String.format("unexpected %s in expression", currentToken));
                 }
             }
@@ -140,17 +142,17 @@ public class Parser {
         //      | app OPERATOR expr
         //      | app
 
-        List<String> operatorStack = new ArrayList<>(); // a specific type ?
+        List<Token> operatorStack = new ArrayList<>();
         List<ASTNode> exprStack = new ArrayList<>();
 
         exprStack.add(parseApplication());
 
-        while (currentToken.type == TokenType.OPERATOR) {
-            String currentOp = currentToken.string;
-            if (!operatorInfo.containsKey(currentOp)) {
+        while (currentToken.getType() == TokenType.OPERATOR) {
+            Token currentOp = currentToken;
+            if (!operatorInfo.containsKey(currentOp.getString())) {
                 throw new ParseErrorException(
-                    currentToken.position,
-                    String.format("unknown operator '%s'", currentToken.string));
+                    currentToken.getPosition(),
+                    String.format("unknown operator '%s'", currentToken.getString()));
             }
             eat(TokenType.OPERATOR);
 
@@ -180,82 +182,57 @@ public class Parser {
         return exprStack.get(0);
     }
 
-    private boolean shouldReduceOperatorStack(List<String> operatorStack, String currentOp) throws ParseErrorException {
+    private boolean shouldReduceOperatorStack(List<Token> operatorStack, Token currentOp) throws ParseErrorException {
         // prevOp is top of stack, currentOp is about to be pushed
         if (operatorStack.size() == 0) return false;
 
-        String prevOp = operatorStack.get(operatorStack.size() - 1);
+        Token prevOp = operatorStack.get(operatorStack.size() - 1);
 
-        OpInfo prevInfo = operatorInfo.get(prevOp);
-        OpInfo currentInfo = operatorInfo.get(currentOp);
+        OpInfo prevInfo = operatorInfo.get(prevOp.getString());
+        OpInfo currentInfo = operatorInfo.get(currentOp.getString());
 
-        if (prevInfo.precedence > currentInfo.precedence) {
+        if (prevInfo.getPrecedence() > currentInfo.getPrecedence()) {
             return true;
 
-        } else if (prevInfo.precedence < currentInfo.precedence) {
+        } else if (prevInfo.getPrecedence() < currentInfo.getPrecedence()) {
             return false;
 
-        } else if (prevInfo.associativity != currentInfo.associativity) {
-            throw new ParseErrorException(String.format(
-                "cannot mix %s (%s) and %s (%s)",
-                prevOp, prevInfo,
-                currentOp, currentInfo));
+        } else if (prevInfo.getAssociativity() != currentInfo.getAssociativity()) {
+            throw new ParseErrorException(
+                prevOp.getPosition(),
+                String.format(
+                    "cannot mix operators '%s' (%s) and '%s' (%s)",
+                    prevOp.getString(), prevInfo,
+                    currentOp.getString(), currentInfo
+                ));
 
-        } else if (prevInfo.associativity == Assoc.NONE) { // both NONE
-            throw new ParseErrorException(String.format(
-                "cannot mix non-associative %s and %s",
-                prevOp,
-                currentOp));
+        } else if (prevInfo.getAssociativity() == Assoc.NONE) { // both NONE
+            throw new ParseErrorException(
+                prevOp.getPosition(),
+                String.format(
+                    "cannot mix non-associative operators '%s' and '%s'",
+                    prevOp.getString(),
+                    currentOp.getString()
+                ));
 
         } else {
             // reduce for LEFT, not for RIGHT
-            return prevInfo.associativity == Assoc.LEFT;
+            return prevInfo.getAssociativity() == Assoc.LEFT;
         }
     }
 
-    private void reduceOperatorStack(List<String> operatorStack, List<ASTNode> exprStack) throws ParseErrorException {
+    private void reduceOperatorStack(List<Token> operatorStack, List<ASTNode> exprStack) throws ParseErrorException {
         // pop top two exprs as operands
         ASTNode right = exprStack.remove(exprStack.size() - 1);
         ASTNode left = exprStack.remove(exprStack.size() - 1);
 
         // pop top operator
-        String op = operatorStack.remove(operatorStack.size() - 1);
+        Token op = operatorStack.remove(operatorStack.size() - 1);
 
-        // TODO: temporary until treat operators as functions
-        ASTNode combined;
-        switch (op) {
-            case "+":
-                combined = new ASTPlus(left, right);
-                break;
-
-            case "-":
-                combined = new ASTMinus(left, right);
-                break;
-
-            case "*":
-                combined = new ASTMult(left, right);
-                break;
-
-            case "^":
-                combined = new ASTPow(left, right);
-                break;
-
-            case "<":
-                combined = new ASTLessThan(left, right);
-                break;
-
-            case "==":
-                combined = new ASTEquals(left, right);
-                break;
-
-            case ":":
-                combined = new ASTListCons(left, right);
-                break;
-
-            default:
-                throw new ParseErrorException("cannot parse operator " + op);
+        if (!operatorInfo.containsKey(op.getString())) {
+            throw new ParseErrorException(op.getPosition(), "cannot parse operator " + op.getString());
         }
-
+        ASTNode combined = operatorInfo.get(op.getString()).getAstConstructor().apply(left, right);
         exprStack.add(combined);
     }
 
@@ -283,7 +260,7 @@ public class Parser {
 
 
     private boolean currentBeginsBaseExpr() {
-        switch (currentToken.type) {
+        switch (currentToken.getType()) {
             case INTEGER:
             case TRUE:
             case FALSE:
@@ -300,7 +277,7 @@ public class Parser {
         // a base expression is anything that can be an argument to a function or operation
         // without needing extra brackets for precedence to work
 
-        switch (currentToken.type) {
+        switch (currentToken.getType()) {
             case INTEGER:
                 return parseInt();
 
@@ -319,7 +296,7 @@ public class Parser {
 
             default:
                 throw new ParseErrorException(
-                    currentToken.position,
+                    currentToken.getPosition(),
                     String.format("unexpected %s in expression", currentToken));
         }
 
@@ -336,7 +313,7 @@ public class Parser {
         List<T> elements = new ArrayList<>();
 
         eat(start);
-        while (currentToken.type != end) {
+        while (currentToken.getType() != end) {
             if (elements.size() > 0) {
                 eat(delimiter);
             }
@@ -378,7 +355,7 @@ public class Parser {
         //             | ( openPattern , ... , openPattern )
         //             | [ openPattern , ... , openPattern ]
 
-        switch (currentToken.type) {
+        switch (currentToken.getType()) {
             case NAME:
                 return parseName();
 
@@ -401,7 +378,7 @@ public class Parser {
 
             default:
                 throw new ParseErrorException(
-                    currentToken.position,
+                    currentToken.getPosition(),
                     String.format("unexpected %s in pattern", currentToken));
         }
 
@@ -414,18 +391,18 @@ public class Parser {
         // TODO: use operator stack parser here too
 
         ASTMatchable firstPattern = parseBasePattern();
-        if (currentToken.type != TokenType.OPERATOR) {
+        if (currentToken.getType() != TokenType.OPERATOR) {
             return firstPattern;
         }
 
         List<ASTMatchable> patterns = new ArrayList<>();
         patterns.add(firstPattern);
 
-        while (currentToken.type == TokenType.OPERATOR) {
-            if (!currentToken.string.equals(":")) {
+        while (currentToken.getType() == TokenType.OPERATOR) {
+            if (!currentToken.getString().equals(":")) {
                 throw new ParseErrorException(
-                    currentToken.position,
-                    String.format("unexpected operator in pattern: %s", currentToken.string));
+                    currentToken.getPosition(),
+                    String.format("unexpected operator in pattern: %s", currentToken.getString()));
             }
             eat(TokenType.OPERATOR);
 
@@ -476,7 +453,7 @@ public class Parser {
 
 
     private ASTLiteralBool parseBool() throws ParseErrorException {
-        if (currentToken.type == TokenType.TRUE) {
+        if (currentToken.getType() == TokenType.TRUE) {
             eat(TokenType.TRUE);
             return new ASTLiteralBool(true);
         }else {
@@ -488,13 +465,13 @@ public class Parser {
     private ASTLiteralInteger parseInt() throws ParseErrorException {
         Token t = currentToken;
         eat(TokenType.INTEGER);
-        return new ASTLiteralInteger(t.string);
+        return new ASTLiteralInteger(t.getString());
     }
 
     private ASTVar parseName() throws ParseErrorException {
         Token t = currentToken;
         eat(TokenType.NAME);
-        return new ASTVar(t.string);
+        return new ASTVar(t.getString());
     }
 
 

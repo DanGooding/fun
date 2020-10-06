@@ -10,7 +10,6 @@ public class FilePosition {
     static final int START_ROW = 1;
     static final int START_COLUMN = 1;
 
-    // both zero indexed
     private final int row;
     private final int column;
 

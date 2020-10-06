@@ -33,21 +33,21 @@ public class BlockMaker implements TokenStream {
 
         Token token = tokenStream.nextToken();
 
-        if (blockStartTokens.contains(token.type)) { // beginning a block
+        if (blockStartTokens.contains(token.getType())) { // beginning a block
             Token next;
             do { // skip over newlines
                 next = tokenStream.nextToken();
-            } while (next.type == TokenType.NEWLINE);
+            } while (next.getType() == TokenType.NEWLINE);
 
-            nextTokens.addLast(new Token(TokenType.BLOCK_BEGIN, next.position));
+            nextTokens.addLast(new Token(TokenType.BLOCK_BEGIN, next.getPosition()));
             nextTokens.addLast(next);
 
-            indentationLevels.add(next.position.getColumn());
+            indentationLevels.add(next.getPosition().getColumn());
 
-        } else if (token.type == TokenType.NEWLINE || token.type == TokenType.EOF) {
+        } else if (token.getType() == TokenType.NEWLINE || token.getType() == TokenType.EOF) {
             // possibly continuing / ending block
 
-            while (token.type == TokenType.NEWLINE) { // skip over newlines
+            while (token.getType() == TokenType.NEWLINE) { // skip over newlines
                 token = tokenStream.nextToken();
             }
 
@@ -57,18 +57,18 @@ public class BlockMaker implements TokenStream {
             while (indentationLevels.size() > 0) {
                 int currentIndentation = indentationLevels.get(indentationLevels.size() - 1);
 
-                if (token.position.getColumn() < currentIndentation || token.type == TokenType.EOF) {
+                if (token.getPosition().getColumn() < currentIndentation || token.getType() == TokenType.EOF) {
                     // ending one block, maybe more
 
                     // position is position of first token not in the block
-                    tokensToInsert.add(new Token(TokenType.BLOCK_END, token.position));
+                    tokensToInsert.add(new Token(TokenType.BLOCK_END, token.getPosition()));
 
                     indentationLevels.remove(indentationLevels.size() - 1); // pop
 
-                } else if (token.position.getColumn() == currentIndentation) {
+                } else if (token.getPosition().getColumn() == currentIndentation) {
                     // next item in the block
 
-                    tokensToInsert.add(new Token(TokenType.BLOCK_DELIM, token.position));
+                    tokensToInsert.add(new Token(TokenType.BLOCK_DELIM, token.getPosition()));
                     break;
 
                 } else { // greater indentation, continuing a block item, no extra tokens needed
