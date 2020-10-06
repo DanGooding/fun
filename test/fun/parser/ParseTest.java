@@ -2,7 +2,6 @@ package fun.parser;
 
 import fun.ast.ASTNode;
 import fun.eval.EvaluationException;
-import fun.parser.Parser;
 import fun.values.BoolValue;
 import fun.values.IntegerValue;
 import fun.values.Value;
@@ -13,7 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 public class ParseTest {
 
     @Test
-    public void worksCorrectly_forLeftAssoc() throws EvaluationException {
+    public void worksCorrectly_forLeftAssoc() throws EvaluationException, ParseErrorException {
         // ARRANGE
         String input = "1 + 2 * 3 - 4 * 5";
 
@@ -27,7 +26,7 @@ public class ParseTest {
     }
 
     @Test
-    public void worksCorrectly_forRightAssoc() throws EvaluationException {
+    public void worksCorrectly_forRightAssoc() throws EvaluationException, ParseErrorException {
         // ARRANGE
         String input = "4 ^ 3 ^ 2 ^ 1";
 
@@ -41,7 +40,7 @@ public class ParseTest {
     }
 
     @Test
-    public void worksCorrectly_forAssocMixture() throws EvaluationException {
+    public void worksCorrectly_forAssocMixture() throws EvaluationException, ParseErrorException {
         // ARRANGE
         String input = "1 + 2 - 3 * 4 * 5 ^ 2 * 3 - 4 ^ 2 ^ 0 - 1 + 1000 == 10 * 9 + 2 ^ 3";
 
@@ -54,8 +53,8 @@ public class ParseTest {
         assertThat(((BoolValue) result).getValue()).isEqualTo(true);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void throws_forMultipleNonAssociative() throws EvaluationException {
+    @Test(expected = ParseErrorException.class)
+    public void throws_forMultipleNonAssociative() throws EvaluationException, ParseErrorException {
         // ARRANGE
         String input = "1 == 2 == 3";
 
@@ -68,7 +67,7 @@ public class ParseTest {
     // TODO: tuples, function application (inc multiple args)
 
     @Test
-    public void parsesCons_inPatterns() throws EvaluationException {
+    public void parsesCons_inPatterns() throws EvaluationException, ParseErrorException {
         // ARRANGE
         String input = "let (x:y:z:zs) = [1,2,3,4,5] in z";
 
@@ -81,7 +80,7 @@ public class ParseTest {
     }
 
     @Test
-    public void doesntRequireBrackets_aroundCons_inCasePattern() {
+    public void doesntRequireBrackets_aroundCons_inCasePattern() throws ParseErrorException {
         // ARRANGE
         String input =
             "case [1,2,3] of\n" +
@@ -93,7 +92,7 @@ public class ParseTest {
     }
 
     @Test
-    public void allowsLeadingAndTrailingWhitespace() {
+    public void allowsLeadingAndTrailingWhitespace() throws ParseErrorException {
         // ARRANGE
         String input = "     1 + 2 * 3    ";
 
@@ -102,7 +101,7 @@ public class ParseTest {
     }
 
     @Test
-    public void allowsComments() throws EvaluationException {
+    public void allowsComments() throws EvaluationException, ParseErrorException {
         // ARRANGE
         String input = "" +
             "# this adds one and two\n" +

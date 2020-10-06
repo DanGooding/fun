@@ -7,7 +7,6 @@ import fun.eval.Thunk;
 
 public class FunctionValue implements Value {
 
-    // TODO: just make public & don't modify, don't use getters ?
     private final ASTMatchable parameterPattern;
     private final ASTNode body;
     private final Environment<Thunk> capturedEnv;
@@ -28,5 +27,10 @@ public class FunctionValue implements Value {
 
     public Environment<Thunk> getCapturedEnv() {
         return capturedEnv;
+    }
+
+    @Override
+    public String toString() {
+        return "<function>";
     }
 }

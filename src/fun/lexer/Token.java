@@ -21,8 +21,8 @@ public class Token {
     @Override
     public String toString() {
         if (string == null) {
-            return String.format("%s %s", type, position);
+            return String.format("%s", type);
         }
-        return String.format("%s \"%s\" %s", type, string, position);
+        return String.format("%s \"%s\"", type, string);
     }
 }

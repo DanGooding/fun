@@ -6,7 +6,6 @@ import fun.lexer.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class Parser {
 
@@ -46,40 +45,32 @@ public class Parser {
      * if currentToken is of given type, advance() to next token
      * otherwise raise an exception
      */
-    private void eat(TokenType type) {
+    private void eat(TokenType type) throws ParseErrorException {
         if (currentToken.type == type) {
             advance();
         } else {
-            // TODO: proper exception type (checked?)
-            // the expected token is possibly not the most useful thing, eg:
+            // TODO: the expected token is possibly not the most useful thing, eg:
             // let t = (1, 2 in t
             // gives 'expected COMMA', rather than close bracket
-            // TODO: include position in source -- show code?
-            throw new RuntimeException(String.format("parse error, %s expected", type));
+            throw new ParseErrorException(currentToken.position, String.format("expected %s", type));
         }
     }
 
     // TODO: top level: multiple expressions - this requires changes to the AST too
-
-    // TODO: proper ParseErrorException ?
-
-    // TODO: parse methods that take parsers: ??
-    //      <T> T parseBracketed(Supplier<T> parseElement)
-
     // TODO: add grammar to each parse function's documentation
 
-    public static ASTNode parseWholeExpr(String input) {
+    public static ASTNode parseWholeExpr(String input) throws ParseErrorException {
         Parser p = new Parser(input);
         return p.parseWhole(p::parseExpr);
     }
 
-    private <T> T parseWhole(Supplier<T> parseItem) {
-        T item = parseItem.get();
+    private <T> T parseWhole(ParserFunction<T> parseItem) throws ParseErrorException {
+        T item = parseItem.parse();
         eat(TokenType.EOF);
         return item;
     }
 
-    private ASTNode parseExpr() {
+    private ASTNode parseExpr() throws ParseErrorException {
 
         switch (currentToken.type) {
 
@@ -136,13 +127,15 @@ public class Parser {
                     return parseOperatorSequence();
 
                 } else {
-                    throw new RuntimeException("parse error in expression");
+                    throw new ParseErrorException(
+                        currentToken.position,
+                        String.format("unexpected %s in expression", currentToken));
                 }
             }
         }
     }
 
-    private ASTNode parseOperatorSequence() {
+    private ASTNode parseOperatorSequence() throws ParseErrorException {
         // expr = ...
         //      | app OPERATOR expr
         //      | app
@@ -155,7 +148,9 @@ public class Parser {
         while (currentToken.type == TokenType.OPERATOR) {
             String currentOp = currentToken.string;
             if (!operatorInfo.containsKey(currentOp)) {
-                throw new RuntimeException("unknown operator " + currentOp);
+                throw new ParseErrorException(
+                    currentToken.position,
+                    String.format("unknown operator '%s'", currentToken.string));
             }
             eat(TokenType.OPERATOR);
 
@@ -185,7 +180,7 @@ public class Parser {
         return exprStack.get(0);
     }
 
-    private boolean shouldReduceOperatorStack(List<String> operatorStack, String currentOp) {
+    private boolean shouldReduceOperatorStack(List<String> operatorStack, String currentOp) throws ParseErrorException {
         // prevOp is top of stack, currentOp is about to be pushed
         if (operatorStack.size() == 0) return false;
 
@@ -201,13 +196,13 @@ public class Parser {
             return false;
 
         } else if (prevInfo.associativity != currentInfo.associativity) {
-            throw new RuntimeException(String.format(
+            throw new ParseErrorException(String.format(
                 "cannot mix %s (%s) and %s (%s)",
                 prevOp, prevInfo,
                 currentOp, currentInfo));
 
         } else if (prevInfo.associativity == Assoc.NONE) { // both NONE
-            throw new RuntimeException(String.format(
+            throw new ParseErrorException(String.format(
                 "cannot mix non-associative %s and %s",
                 prevOp,
                 currentOp));
@@ -218,7 +213,7 @@ public class Parser {
         }
     }
 
-    private void reduceOperatorStack(List<String> operatorStack, List<ASTNode> exprStack) {
+    private void reduceOperatorStack(List<String> operatorStack, List<ASTNode> exprStack) throws ParseErrorException {
         // pop top two exprs as operands
         ASTNode right = exprStack.remove(exprStack.size() - 1);
         ASTNode left = exprStack.remove(exprStack.size() - 1);
@@ -258,14 +253,14 @@ public class Parser {
                 break;
 
             default:
-                throw new RuntimeException("cannot parse operator " + op);
+                throw new ParseErrorException("cannot parse operator " + op);
         }
 
         exprStack.add(combined);
     }
 
 
-    private ASTNode parseApplication() {
+    private ASTNode parseApplication() throws ParseErrorException {
         // a base expression, applied to zero or more base expressions
 
         // app = app baseExpr
@@ -301,7 +296,7 @@ public class Parser {
         }
     }
 
-    private ASTNode parseBaseExpr() {
+    private ASTNode parseBaseExpr() throws ParseErrorException {
         // a base expression is anything that can be an argument to a function or operation
         // without needing extra brackets for precedence to work
 
@@ -323,13 +318,21 @@ public class Parser {
                 return parseListLiteral();
 
             default:
-                throw new RuntimeException("parse error in (base) expression");
+                throw new ParseErrorException(
+                    currentToken.position,
+                    String.format("unexpected %s in expression", currentToken));
         }
 
     }
 
 
-    private <T> List<T> parseDelimited(Supplier<T> parseElement, TokenType start, TokenType delimiter, TokenType end) {
+    private <T> List<T> parseDelimited(
+        ParserFunction<T> parseElement,
+        TokenType start,
+        TokenType delimiter,
+        TokenType end
+    ) throws ParseErrorException {
+
         List<T> elements = new ArrayList<>();
 
         eat(start);
@@ -337,14 +340,14 @@ public class Parser {
             if (elements.size() > 0) {
                 eat(delimiter);
             }
-            elements.add(parseElement.get());
+            elements.add(parseElement.parse());
         }
         eat(end);
 
         return elements;
     }
 
-    private ASTNode parseBracketedExpr() {
+    private ASTNode parseBracketedExpr() throws ParseErrorException {
         List<ASTNode> exprs = parseDelimited(
             this::parseExpr,
             TokenType.OPEN_BRACKET, TokenType.COMMA, TokenType.CLOSE_BRACKET);
@@ -356,7 +359,7 @@ public class Parser {
         }
     }
 
-    private ASTNode parseListLiteral() {
+    private ASTNode parseListLiteral() throws ParseErrorException {
         List<ASTNode> elements = parseDelimited(
             this::parseExpr,
             TokenType.OPEN_SQUARE_BRACKET, TokenType.COMMA, TokenType.CLOSE_SQUARE_BRACKET);
@@ -368,7 +371,7 @@ public class Parser {
         return list;
     }
 
-    private ASTMatchable parseBasePattern() {
+    private ASTMatchable parseBasePattern() throws ParseErrorException {
         // basePattern = NAME | UNDERSCORE
         //             | INTEGER | TRUE | FALSE
         //             | ( openPattern )
@@ -397,12 +400,14 @@ public class Parser {
                 return parseListPattern();
 
             default:
-                throw new RuntimeException("parse error in pattern");
+                throw new ParseErrorException(
+                    currentToken.position,
+                    String.format("unexpected %s in pattern", currentToken));
         }
 
     }
 
-    private ASTMatchable parseOpenPattern() {
+    private ASTMatchable parseOpenPattern() throws ParseErrorException {
         // openPattern = basePattern : openPattern
         //             | basePattern
 
@@ -418,7 +423,8 @@ public class Parser {
 
         while (currentToken.type == TokenType.OPERATOR) {
             if (!currentToken.string.equals(":")) {
-                throw new RuntimeException(
+                throw new ParseErrorException(
+                    currentToken.position,
                     String.format("unexpected operator in pattern: %s", currentToken.string));
             }
             eat(TokenType.OPERATOR);
@@ -437,7 +443,7 @@ public class Parser {
         return listPattern;
     }
 
-    private ASTMatchable parseBracketedPattern() {
+    private ASTMatchable parseBracketedPattern() throws ParseErrorException {
         // bracketedPattern = ( openPattern )
         //                  | ( openPattern , ... )
 
@@ -453,7 +459,7 @@ public class Parser {
         }
     }
 
-    private ASTMatchable parseListPattern() {
+    private ASTMatchable parseListPattern() throws ParseErrorException {
         // listPattern = [ openPattern , ... ]
 
         List<ASTMatchable> elements =
@@ -469,7 +475,7 @@ public class Parser {
     }
 
 
-    private ASTLiteralBool parseBool() {
+    private ASTLiteralBool parseBool() throws ParseErrorException {
         if (currentToken.type == TokenType.TRUE) {
             eat(TokenType.TRUE);
             return new ASTLiteralBool(true);
@@ -479,13 +485,13 @@ public class Parser {
         }
     }
 
-    private ASTLiteralInteger parseInt() {
+    private ASTLiteralInteger parseInt() throws ParseErrorException {
         Token t = currentToken;
         eat(TokenType.INTEGER);
         return new ASTLiteralInteger(t.string);
     }
 
-    private ASTVar parseName() {
+    private ASTVar parseName() throws ParseErrorException {
         Token t = currentToken;
         eat(TokenType.NAME);
         return new ASTVar(t.string);
