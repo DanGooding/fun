@@ -4,7 +4,7 @@ My little functional programming language.
 Current features include 
 - lazy evaluation
 - pattern matching
-- recursion (and mutatual recursion)
+- recursion (and mutual recursion)
 - lists, tuples, booleans, and arbitrary size integers
 - no side effects, just expressions that evaluate to a values
 - Hindley-Milner type inference
@@ -33,6 +33,12 @@ in let take = lambda n -> lambda xs ->
 # an infinite list of the fibonacci numbers!
 in let fibs = 0 : 1 : zipWith add fibs (tail fibs)
 
-# laziness means only the first 20 are actually computed here
-in take 20 fibs
+# laziness means only the first 15 are actually computed here
+in take 15 fibs
 ```
+When run this gives the result's type and value. (list printed with cons notation)
+```
+[Integer]
+(0 : (1 : (1 : (2 : (3 : (5 : (8 : (13 : (21 : (34 : (55 : (89 : (144 : (233 : (377 : [])))))))))))))))
+```
+
