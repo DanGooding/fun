@@ -7,29 +7,31 @@ import fun.parser.Parser;
 import fun.types.*;
 import fun.values.Value;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.Callable;
 
-public class Main {
+import picocli.CommandLine;
 
-    public static void main(String[] args) {
+@CommandLine.Command(name = "execute", mixinStandardHelpOptions = true, description = "executes a program")
+public class Main implements Callable<Integer> {
 
-        if (args.length == 0) {
-            System.err.println("no argument, expected filename");
-            return;
-        }
-        String filename = args[0];
+    @CommandLine.Parameters(index = "0", description = "the .fun source file to execute.")
+    private File file;
 
+    @Override
+    public Integer call() throws Exception {
         try {
-            String content = Files.readString(Paths.get(filename));
+            String content = Files.readString(file.toPath());
 
             ASTNode expr = Parser.parseWholeExpr(content);
 
             Scheme type =
-                Inferer
-                    .inferType(expr)
-                    .refreshVariableNames(new VariableNameRefresher());
+                    Inferer
+                            .inferType(expr)
+                            .refreshVariableNames(new VariableNameRefresher());
 
             System.out.println(type.prettyPrint());
 
@@ -37,14 +39,22 @@ public class Main {
             result.fullyForce();
 
             System.out.println(result);
+            return 0;
 
         } catch (IOException e) {
-            System.err.printf("unable to read file '%s'%n", filename);
+            System.err.printf("unable to read file '%s'%n", file.toString());
+            return 1;
         } catch (ParseErrorException e) {
             System.err.println(e.getMessage());
+            return 1;
         } catch (TypeErrorException | EvaluationException e) {
             System.err.println(e);
+            return 1;
         }
+    }
 
+    public static void main(String[] args) {
+        int exitCode = new CommandLine(new Main()).execute(args);
+        System.exit(exitCode);
     }
 }
