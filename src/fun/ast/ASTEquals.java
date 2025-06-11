@@ -5,10 +5,7 @@ import fun.eval.EvaluationException;
 import fun.eval.RuntimeTypeErrorException;
 import fun.eval.Thunk;
 import fun.types.*;
-import fun.values.BoolValue;
-import fun.values.ConstantValue;
-import fun.values.IntegerValue;
-import fun.values.Value;
+import fun.values.*;
 
 // TODO: add not equals ? or just use boolean not along with this?
 public class ASTEquals extends ASTNode {
@@ -21,31 +18,48 @@ public class ASTEquals extends ASTNode {
         this.right = right;
     }
 
-    @Override
-    public BoolValue evaluate(Environment<Thunk> env) throws EvaluationException {
-        Value leftValue = left.evaluate(env);
-        Value rightValue = right.evaluate(env);
-
+    private boolean valuesEqual(Value leftValue, Value rightValue) throws EvaluationException {
         if (leftValue instanceof ConstantValue && rightValue instanceof ConstantValue) {
             // TODO: atrocious, have a method on fun.values.ConstantValue or something
             // type tag + lookup table of equatable types + method
 
             if (leftValue instanceof BoolValue && rightValue instanceof BoolValue) {
-                return new BoolValue(((BoolValue) leftValue).getValue() == ((BoolValue) rightValue).getValue());
+                return ((BoolValue) leftValue).getValue() == ((BoolValue) rightValue).getValue();
 
-            }else if (leftValue instanceof IntegerValue && rightValue instanceof IntegerValue) {
-                return new BoolValue(((IntegerValue) leftValue).getValue().equals(((IntegerValue) rightValue).getValue()));
+            } else if (leftValue instanceof IntegerValue && rightValue instanceof IntegerValue) {
+                return ((IntegerValue) leftValue).getValue().equals(((IntegerValue) rightValue).getValue());
 
-            }else if (leftValue.getClass() == rightValue.getClass()) {
+            } else if (leftValue instanceof TupleValue leftTuple && rightValue instanceof TupleValue rightTuple) {
+
+                if (leftTuple.size() != rightTuple.size()) return false;
+
+                for (int i = 0; i < leftTuple.size(); i++) {
+                    Value leftElement = leftTuple.getElement(i).force();
+                    Value rightElement = rightTuple.getElement(i).force();
+                    if (!this.valuesEqual(leftElement, rightElement)) return false;
+                }
+
+                return true;
+
+            } else if (leftValue.getClass() == rightValue.getClass()) {
                 throw new UnsupportedOperationException(
-                    String.format("equality on %s not implemented", leftValue.getClass().getSimpleName()));
+                        String.format("equality on %s not implemented", leftValue.getClass().getSimpleName()));
 
-            }else {
+            } else {
                 throw new RuntimeTypeErrorException("cannot equate values of different type");
             }
-        }else {
+
+        } else {
             throw new RuntimeTypeErrorException("functions are not equatable");
         }
+    }
+
+    @Override
+    public BoolValue evaluate(Environment<Thunk> env) throws EvaluationException {
+        Value leftValue = left.evaluate(env);
+        Value rightValue = right.evaluate(env);
+
+        return new BoolValue(this.valuesEqual(leftValue, rightValue));
     }
 
     @Override
